@@ -14,6 +14,7 @@ import projectRouter from "./routes/projectRouter.js";
 
 const app = express();
 dotenv.config({ path: "./config/config.env" });
+app.set('trust proxy', true);
 
 app.use(
     cors({
@@ -33,6 +34,7 @@ app.use(
         tempFileDir: "/tmp/",
     })
 );
+
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/timeline", timelineRouter);

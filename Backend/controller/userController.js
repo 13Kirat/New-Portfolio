@@ -71,7 +71,7 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       url: cloudinaryResponseForResume.secure_url, // Set your cloudinary secure_url here
     },
   });
-  generateToken(user, "Registered!", 201, res);
+  generateToken(user, "Registered!", 201, req, res);
 });
 
 export const login = catchAsyncErrors(async (req, res, next) => {
@@ -87,7 +87,7 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   if (!isPasswordMatched) {
     return next(new ErrorHandler("Invalid Email Or Password", 401));
   }
-  generateToken(user, "Login Successfully!", 200, res);
+  generateToken(user, "Login Successfully!", 200, req, res);
 });
 
 export const logout = catchAsyncErrors(async (req, res, next) => {
@@ -262,5 +262,5 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save();
 
-  generateToken(user, "Reset Password Successfully!", 200, res);
+  generateToken(user, "Reset Password Successfully!", 200, req, res);
 });
