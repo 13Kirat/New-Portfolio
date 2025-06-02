@@ -113,7 +113,7 @@ export const login = (email, password) => async (dispatch) => {
   dispatch(userSlice.actions.loginRequest());
   try {
     const { data } = await axios.post(
-      "http://localhost:4000/api/v1/user/login",
+      "https://new-portfolio-8kjr.onrender.com/api/v1/user/login",
       { email, password },
       { withCredentials: true, headers: { "Content-Type": "application/json" } }
     );
@@ -127,7 +127,7 @@ export const login = (email, password) => async (dispatch) => {
 export const getUser = () => async (dispatch) => {
   dispatch(userSlice.actions.loadUserRequest());
   try {
-    const { data } = await axios.get("http://localhost:4000/api/v1/user/me", {
+    const { data } = await axios.get("https://new-portfolio-8kjr.onrender.com/api/v1/user/me", {
       withCredentials: true,
     });
     dispatch(userSlice.actions.loadUserSuccess(data.user));
@@ -140,7 +140,7 @@ export const getUser = () => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   try {
     const { data } = await axios.get(
-      "http://localhost:4000/api/v1/user/logout",
+      "https://new-portfolio-8kjr.onrender.com/api/v1/user/logout",
       { withCredentials: true }
     );
     dispatch(userSlice.actions.logoutSuccess(data.message));
@@ -154,7 +154,7 @@ export const updatePassword = (currentPassword, newPassword, confirmNewPassword)
   dispatch(userSlice.actions.updatePasswordRequest());
   try {
     const { data } = await axios.put(
-      "http://localhost:4000/api/v1/user/password/update",
+      "https://new-portfolio-8kjr.onrender.com/api/v1/user/password/update",
       { currentPassword, newPassword, confirmNewPassword },
       {
         withCredentials: true,
@@ -174,7 +174,7 @@ export const updateProfile = (data) => async (dispatch) => {
   dispatch(userSlice.actions.updateProfileRequest());
   try {
     const response = await axios.put(
-      "http://localhost:4000/api/v1/user/me/profile/update",
+      "https://new-portfolio-8kjr.onrender.com/api/v1/user/me/profile/update",
       data,
       {
         withCredentials: true,
