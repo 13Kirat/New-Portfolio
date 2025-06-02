@@ -65,14 +65,14 @@ const Hero = () => {
         </Link>}
       </div>
       <div className="mt-4 md:mt-8 lg:mt-10  flex gap-3">
-        <Link to={user?.githubURL} target="_blank">
+        {user?.githubURL && <Link to={user?.githubURL} target="_blank">
           <Button className="rounded-[30px] flex items-center gap-2 flex-row">
             <span>
               <Github />
             </span>
             <span>Github</span>
           </Button>
-        </Link>
+        </Link>}
         <Link to={user?.resume && user?.resume.url} target="_blank">
           <Button className="rounded-[30px] flex items-center gap-2 flex-row">
             <span>
