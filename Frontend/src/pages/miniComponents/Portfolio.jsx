@@ -50,10 +50,10 @@ const Portfolio = () => {
           ? projects &&
           projects.map((element) => {
             return (
-              <Link to={`/project/${element._id}`} key={element._id}>
+              <Link to={`/project/${element?._id}`} key={element?._id}>
                 <img
-                  src={element.projectBanner && element.projectBanner.url}
-                  alt={element.title}
+                  src={element?.projectBanner && element?.projectBanner.url}
+                  alt={element?.title}
                 />
               </Link>
             );
@@ -61,10 +61,10 @@ const Portfolio = () => {
           : projects &&
           projects.slice(0, 9).map((element) => {
             return (
-              <Link to={`/project/${element._id}`} key={element._id}>
+              <Link to={`/project/${element?._id}`} key={element?._id}>
                 <img
-                  src={element.projectBanner && element.projectBanner.url}
-                  alt={element.title}
+                  src={element?.projectBanner && element?.projectBanner.url}
+                  alt={element?.title}
                 />
               </Link>
             );

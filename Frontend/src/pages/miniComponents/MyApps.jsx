@@ -23,14 +23,14 @@ const MyApps = () => {
         {apps &&
           apps.map((element) => {
             return (
-              <Card className="h-fit p-7 flex flex-col justify-center items-center gap-3" key={element._id}>
+              <Card className="h-fit p-7 flex flex-col justify-center items-center gap-3" key={element?._id}>
                 <img
-                  src={element.svg && element.svg.url}
+                  src={element?.svg && element?.svg?.url}
                   alt="skill"
                   className="h-12 sm:h-24 w-auto"
                 />
                 <p className="text-muted-foreground text-center">
-                  {element.name}
+                  {element?.name}
                 </p>
               </Card>
             );
