@@ -32,22 +32,15 @@ const About = () => {
           </div>
           <div className="flex justify-center flex-col tracking-[1px] text-xl gap-5">
             <p>
-              My name is Gurkirat Singh. I will
-              graduate in Software Engineering from SMIU around 2024. I work as
-              a web developer and freelancer. My hobbies include watching
-              movies, series, playing video games, and occasionally cooking.
+              My name is Gurkirat Singh. I’m currently pursuing Electronics and Computer Engineering at Thapar University, and I'll be graduating in 2027. I work as a mobile app and web developer, and I’ve interned in real-world projects using React Native and the MERN stack.
             </p>
             <p>
-              I have interests not only in technology but also in movies,
-              series, video games, and cooking. I excel in meeting deadlines for
-              my work.
+              I’m passionate about building practical solutions — from B2B e-commerce apps to community-based platforms. Outside of tech, I enjoy watching movies and series, exploring gaming occasionally, and engaging in student-led technical events and hackathons.
             </p>
           </div>
         </div>
         <p className="tracking-[1px] text-xl">
-          My dedication and perseverance in timely delivery of work are integral
-          to me. I maintain the courage to face any challenges for extended
-          periods.
+          I value consistency and creativity in my work. Whether it’s managing deadlines or experimenting with new ideas, I stay committed to learning, adapting, and delivering impactful results.
         </p>
       </div>
     </div>
