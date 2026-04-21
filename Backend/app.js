@@ -43,6 +43,11 @@ app.use("/api/v1/skill", skillRouter);
 app.use("/api/v1/softwareapplication", softwareApplicationRouter);
 app.use("/api/v1/project", projectRouter);
 
+app.get("/", (req, res) => {
+  res.json({ message: "Backend is up and running" });
+});
+
+
 dbConnection();
 app.use(errorMiddleware);
 
