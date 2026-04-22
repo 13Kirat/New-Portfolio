@@ -1,6 +1,7 @@
 import { Message } from "../models/messageSchema.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/error.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const sendMessage = catchAsyncErrors(async (req, res, next) => {
   const { senderName, subject, message } = req.body;
@@ -8,6 +9,18 @@ export const sendMessage = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Please Fill Full Form!", 400));
   }
   const data = await Message.create({ senderName, subject, message });
+
+  try {
+    await sendEmail({
+      email: "gs9965416@gmail.com",
+      subject: `New Portfolio Message: ${subject}`,
+      message: `You have received a new message from ${senderName} via your portfolio contact form.\n\nSubject: ${subject}\n\nMessage:\n${message}`,
+    });
+  } catch (error) {
+    console.error("Email Sending Error:", error);
+    // We don't return next(error) here because the message was already saved to DB successfully
+  }
+
   res.status(201).json({
     success: true,
     message: "Message Sent",
