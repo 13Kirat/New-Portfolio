@@ -39,13 +39,27 @@ const userSchema = new mongoose.Schema({
   resume: {
     public_id: {
       type: String,
-      required: true,
     },
     url: {
       type: String,
-      required: true,
     },
   },
+  resumes: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      public_id: {
+        type: String,
+        required: true,
+      },
+      url: {
+        type: String,
+        required: true,
+      },
+    },
+  ],
   portfolioURL: {
     type: String,
     required: [true, "Portfolio URL Required!"],

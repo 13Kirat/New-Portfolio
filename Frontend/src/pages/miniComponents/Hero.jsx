@@ -12,13 +12,34 @@ import { Link } from "react-router-dom";
 import { Typewriter } from "react-simple-typewriter";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
+import ResumeModal from "./ResumeModal";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const Hero = () => {
   const [user, setUser] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState(null);
+
+  const resumes =
+    user?.resumes?.length > 0
+      ? user.resumes
+      : user?.resume?.url
+        ? [{ _id: "legacy-resume", name: "Resume", url: user.resume.url }]
+        : [];
+
+  const handleOpenResume = (resume) => {
+    setSelectedResume({
+      url: `${BACKEND_URL}/api/v1/user/portfolio/resume/${resume._id || "legacy-resume"}`,
+      name: resume.name || "Resume"
+    });
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     const getMyProfile = async () => {
       const { data } = await axios.get(
-        "https://new-portfolio-8kjr.onrender.com/api/v1/user/portfolio/me",
+        `${BACKEND_URL}/api/v1/user/portfolio/me`,
         { withCredentials: true }
       );
       setUser(data.user);
@@ -73,17 +94,27 @@ const Hero = () => {
             <span>Github</span>
           </Button>
         </Link>}
-        <Link to={user?.resume && user?.resume.url} target="_blank">
-          <Button className="rounded-[30px] flex items-center gap-2 flex-row">
+        {resumes.map((resume, index) => (
+          <Button
+            key={`${resume.url}-${index}`}
+            onClick={() => handleOpenResume(resume)}
+            className="rounded-[30px] flex items-center gap-2 flex-row"
+          >
             <span>
               <ExternalLink />
             </span>
-            <span>Resume </span>
+            <span>{resume.name || `Resume ${index + 1}`}</span>
           </Button>
-        </Link>
+        ))}
       </div>
       <p className="mt-8 text-xl tracking-[2px]">{user?.aboutMe}</p>
       <hr className="my-8 md::my-10 " />
+      <ResumeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        resumeUrl={selectedResume?.url}
+        resumeName={selectedResume?.name}
+      />
     </div>
   );
 };

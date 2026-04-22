@@ -5,6 +5,8 @@ import axios from "axios";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const Contact = () => {
   const [senderName, setSenderName] = useState("");
   const [subject, setSubject] = useState("");
@@ -15,7 +17,7 @@ const Contact = () => {
     setLoading(true);
     await axios
       .post(
-        "https://new-portfolio-8kjr.onrender.com/api/v1/message/send",
+        `${BACKEND_URL}/api/v1/message/send`,
         { senderName, subject, message },
         {
           withCredentials: true,

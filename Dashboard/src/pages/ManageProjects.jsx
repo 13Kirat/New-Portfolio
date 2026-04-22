@@ -75,7 +75,16 @@ const ManageProjects = () => {
                         Stack
                       </TableHead>
                       <TableHead className="hidden md:table-cell">
-                        Deployed
+                        Domain
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Category
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Status
+                      </TableHead>
+                      <TableHead className="hidden md:table-cell">
+                        Visible
                       </TableHead>
                       <TableHead className="md:table-cell">Actions</TableHead>
                     </TableRow>
@@ -104,7 +113,16 @@ const ManageProjects = () => {
                               {element.stack}
                             </TableCell>
                             <TableCell className="hidden md:table-cell">
-                              {element.deployed}
+                              {element.domain || "-"}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              {element.category || "-"}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              {element.status || "-"}
+                            </TableCell>
+                            <TableCell className="hidden md:table-cell">
+                              {element.visible ? "Yes" : "No"}
                             </TableCell>
                             <TableCell className="flex flex-row items-center gap-3 h-24">
                               <TooltipProvider>

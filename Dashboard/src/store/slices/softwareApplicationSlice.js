@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const softwareApplicationSlice = createSlice({
   name: "softwareApplications",
   initialState: {
@@ -74,7 +76,7 @@ export const getAllSoftwareApplications = () => async (dispatch) => {
   );
   try {
     const response = await axios.get(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/softwareapplication/getall",
+      `${BACKEND_URL}/api/v1/softwareapplication/getall`,
       { withCredentials: true }
     );
     dispatch(
@@ -98,7 +100,7 @@ export const addNewSoftwareApplication = (data) => async (dispatch) => {
   );
   try {
     const response = await axios.post(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/softwareapplication/add",
+      `${BACKEND_URL}/api/v1/softwareapplication/add`,
       data,
       {
         withCredentials: true,
@@ -126,7 +128,7 @@ export const deleteSoftwareApplication = (id) => async (dispatch) => {
   );
   try {
     const response = await axios.delete(
-      `https://new-portfolio-8kjr.onrender.com/api/v1/softwareapplication/delete/${id}`,
+      `${BACKEND_URL}/api/v1/softwareapplication/delete/${id}`,
       {
         withCredentials: true,
       }

@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   clearAllUserErrors,
+  deleteResume,
   getUser,
   resetProfile,
   updateProfile,
@@ -12,7 +13,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { Textarea } from "@/components/ui/textarea";
 import SpecialLoadingButton from "./SpecialLoadingButton";
-import { Link } from "react-router-dom";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const UpdateProfile = () => {
   const { user, loading, error, isUpdated, message } = useSelector(
@@ -43,10 +45,20 @@ const UpdateProfile = () => {
   const [avatarPreview, setAvatarPreview] = useState(
     user && user.avatar && user.avatar.url
   );
-  const [resume, setResume] = useState(user && user.resume && user.resume.url);
-  const [resumePreview, setResumePreview] = useState(
-    user && user.resume && user.resume.url
-  );
+  const [resumeEntries, setResumeEntries] = useState([
+    { name: "", file: null, preview: "" },
+  ]);
+
+  const existingResumes =
+    user?.resumes?.length > 0
+      ? user.resumes
+      : user?.resume?.url
+        ? [{ _id: "legacy-resume", name: "Resume", url: user.resume.url }]
+        : [];
+
+  const handleDeleteResume = (resumeId) => {
+    dispatch(deleteResume(resumeId));
+  };
 
   const dispatch = useDispatch();
 
@@ -59,13 +71,30 @@ const UpdateProfile = () => {
       setAvatar(file);
     };
   };
-  const resumeHandler = (e) => {
-    const file = e.target.files[0];
+  const addResumeEntry = () => {
+    setResumeEntries((prev) => [...prev, { name: "", file: null, preview: "" }]);
+  };
+
+  const removeResumeEntry = (index) => {
+    setResumeEntries((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const updateResumeName = (index, value) => {
+    setResumeEntries((prev) =>
+      prev.map((entry, i) => (i === index ? { ...entry, name: value } : entry))
+    );
+  };
+
+  const updateResumeFile = (index, file) => {
+    if (!file) return;
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
-      setResumePreview(reader.result);
-      setResume(file);
+      setResumeEntries((prev) =>
+        prev.map((entry, i) =>
+          i === index ? { ...entry, file, preview: reader.result } : entry
+        )
+      );
     };
   };
 
@@ -82,7 +111,19 @@ const UpdateProfile = () => {
     formData.append("twitterURL", twitterURL);
     formData.append("facebookURL", facebookURL);
     formData.append("avatar", avatar);
-    formData.append("resume", resume);
+    const validResumeEntries = resumeEntries.filter(
+      (entry) => entry.file && entry.name.trim()
+    );
+
+    if (validResumeEntries.length > 0) {
+      formData.append(
+        "resumeNames",
+        JSON.stringify(validResumeEntries.map((entry) => entry.name.trim()))
+      );
+      validResumeEntries.forEach((entry) => {
+        formData.append("resumes", entry.file);
+      });
+    }
     dispatch(updateProfile(formData));
   };
 
@@ -94,11 +135,12 @@ const UpdateProfile = () => {
     if (isUpdated) {
       dispatch(getUser());
       dispatch(resetProfile());
+      setResumeEntries([{ name: "", file: null, preview: "" }]);
     }
     if (message) {
       toast.success(message);
     }
-  }, [dispatch, loading, error, isUpdated]);
+  }, [dispatch, loading, error, isUpdated, message]);
 
   return (
     <>
@@ -129,23 +171,68 @@ const UpdateProfile = () => {
                   </div>
                 </div>
                 <div className="grid gap-2 w-full sm:w-72">
-                  <Label>Resume</Label>
-                  <Link
-                    to={user && user.resume && user.resume.url}
-                    target="_blank"
-                  >
-                    <img
-                      src={resumePreview ? resumePreview : "/avatarHolder.jpg"}
-                      alt="avatar"
-                      className="w-full  h-auto sm:w-72 sm:h-72 rounded-2xl"
-                    />
-                  </Link>
-                  <div className="relative">
-                    <input
-                      type="file"
-                      onChange={resumeHandler}
-                      className="avatar-update-btn"
-                    />
+                  <Label>Resumes (PDF)</Label>
+                  <div className="space-y-2">
+                    {existingResumes.map((resume, index) => (
+                      <div
+                        key={`${resume.url}-${index}`}
+                        className="flex items-center justify-between gap-2"
+                      >
+                        <a
+                          href={`${BACKEND_URL}/api/v1/user/me/resume/view/${resume._id || "legacy-resume"
+                            }`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block text-sm text-sky-700 underline"
+                        >
+                          {resume.name || `Resume ${index + 1}`}
+                        </a>
+                        {resume._id && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => handleDeleteResume(resume._id)}
+                          >
+                            Delete
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-3 mt-3">
+                    {resumeEntries.map((entry, index) => (
+                      <div key={index} className="border rounded-md p-3">
+                        <Input
+                          type="text"
+                          placeholder="Resume Name (e.g., Backend CV)"
+                          value={entry.name}
+                          onChange={(e) => updateResumeName(index, e.target.value)}
+                        />
+                        <Input
+                          type="file"
+                          accept="application/pdf"
+                          className="mt-2"
+                          onChange={(e) => updateResumeFile(index, e.target.files?.[0])}
+                        />
+                        {entry.preview && (
+                          <p className="mt-2 text-xs text-gray-600">PDF selected</p>
+                        )}
+                        {resumeEntries.length > 1 && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="mt-2"
+                            onClick={() => removeResumeEntry(index)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={addResumeEntry}>
+                      Add Another Resume
+                    </Button>
                   </div>
                 </div>
               </div>

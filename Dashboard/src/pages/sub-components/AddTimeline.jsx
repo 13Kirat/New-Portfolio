@@ -20,14 +20,16 @@ const AddTimeline = () => {
 
   const { loading, error, message } = useSelector((state) => state.timeline);
 
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setFrom("");
+    setTo("");
+  };
+
   const handleAddNewTimeline = (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("from", from);
-    formData.append("to", to);
-    dispatch(addNewTimeline(formData));
+    dispatch(addNewTimeline({ title, description, from, to }));
   };
 
   const dispatch = useDispatch();
@@ -38,6 +40,7 @@ const AddTimeline = () => {
     }
     if (message) {
       toast.success(message);
+      resetForm();
       dispatch(resetTimelineSlice());
       dispatch(getAllTimeline());
     }
@@ -127,13 +130,12 @@ const AddTimeline = () => {
             {!loading ? (
               <Button
                 type="submit"
-                onClick={() => handleAddNewSkill()}
                 className="w-full"
               >
                 Add Timeline
               </Button>
             ) : (
-              <SpecialLoadingButton content={"Adding New Skill"} />
+              <SpecialLoadingButton content={"Adding New Timeline"} />
             )}
           </div>
         </form>

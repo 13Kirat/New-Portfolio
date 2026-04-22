@@ -4,13 +4,17 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const ViewProject = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [technologies, setTechnologies] = useState("");
+  const [domain, setDomain] = useState("");
+  const [category, setCategory] = useState("");
   const [stack, setStack] = useState("");
+  const [status, setStatus] = useState("");
   const [gitRepoLink, setGitRepoLink] = useState("");
-  const [deployed, setDeployed] = useState("");
   const [projectLink, setProjectLink] = useState("");
   const [projectBanner, setProjectBanner] = useState("");
 
@@ -19,14 +23,16 @@ const ViewProject = () => {
   useEffect(() => {
     const getProject = async () => {
       await axios
-        .get(`https://new-portfolio-8kjr.onrender.com/api/v1/project/get/${id}`, {
+        .get(`${BACKEND_URL}/api/v1/project/get/${id}`, {
           withCredentials: true,
         })
         .then((res) => {
           setTitle(res.data.project.title);
           setDescription(res.data.project.description);
-          setStack(res.data.project.stack);
-          setDeployed(res.data.project.deployed);
+          setDomain(res.data.project.domain || "");
+          setCategory(res.data.project.category || "");
+          setStack(res.data.project.stack || "");
+          setStatus(res.data.project.status || "");
           setTechnologies(res.data.project.technologies);
           setGitRepoLink(res.data.project.gitRepoLink);
           setProjectLink(res.data.project.projectLink);
@@ -89,14 +95,30 @@ const ViewProject = () => {
                     ))}
                   </ul>
                 </div>
-                <div className="w-full sm:col-span-4">
-                  <p className="text-2xl mb-2">Stack:</p>
-                  <p>{stack}</p>
-                </div>
-                <div className="w-full sm:col-span-4">
-                  <p className="text-2xl mb-2">Deployed:</p>
-                  <p>{deployed}</p>
-                </div>
+                {domain && (
+                  <div className="w-full sm:col-span-4">
+                    <p className="text-2xl mb-2">Domain:</p>
+                    <p>{domain}</p>
+                  </div>
+                )}
+                {category && (
+                  <div className="w-full sm:col-span-4">
+                    <p className="text-2xl mb-2">Category:</p>
+                    <p>{category}</p>
+                  </div>
+                )}
+                {stack && (
+                  <div className="w-full sm:col-span-4">
+                    <p className="text-2xl mb-2">Stack:</p>
+                    <p>{stack}</p>
+                  </div>
+                )}
+                {status && (
+                  <div className="w-full sm:col-span-4">
+                    <p className="text-2xl mb-2">Status:</p>
+                    <p>{status}</p>
+                  </div>
+                )}
                 <div className="w-full sm:col-span-4">
                   <p className="text-2xl mb-2">Github Repository Link:</p>
                   <Link

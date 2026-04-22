@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -97,6 +99,24 @@ const userSlice = createSlice({
       state.message = null;
       state.error = action.payload;
     },
+    deleteResumeRequest(state, action) {
+      state.loading = true;
+      state.isUpdated = false;
+      state.message = null;
+      state.error = null;
+    },
+    deleteResumeSuccess(state, action) {
+      state.loading = false;
+      state.isUpdated = true;
+      state.message = action.payload;
+      state.error = null;
+    },
+    deleteResumeFailed(state, action) {
+      state.loading = false;
+      state.isUpdated = false;
+      state.message = null;
+      state.error = action.payload;
+    },
     updateProfileResetAfterUpdate(state, action) {
       state.error = null;
       state.isUpdated = false;
@@ -113,7 +133,7 @@ export const login = (email, password) => async (dispatch) => {
   dispatch(userSlice.actions.loginRequest());
   try {
     const { data } = await axios.post(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/user/login",
+      `${BACKEND_URL}/api/v1/user/login`,
       { email, password },
       { withCredentials: true, headers: { "Content-Type": "application/json" } }
     );
@@ -127,7 +147,7 @@ export const login = (email, password) => async (dispatch) => {
 export const getUser = () => async (dispatch) => {
   dispatch(userSlice.actions.loadUserRequest());
   try {
-    const { data } = await axios.get("https://new-portfolio-8kjr.onrender.com/api/v1/user/me", {
+    const { data } = await axios.get(`${BACKEND_URL}/api/v1/user/me`, {
       withCredentials: true,
     });
     dispatch(userSlice.actions.loadUserSuccess(data.user));
@@ -140,7 +160,7 @@ export const getUser = () => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   try {
     const { data } = await axios.get(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/user/logout",
+      `${BACKEND_URL}/api/v1/user/logout`,
       { withCredentials: true }
     );
     dispatch(userSlice.actions.logoutSuccess(data.message));
@@ -154,7 +174,7 @@ export const updatePassword = (currentPassword, newPassword, confirmNewPassword)
   dispatch(userSlice.actions.updatePasswordRequest());
   try {
     const { data } = await axios.put(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/user/password/update",
+      `${BACKEND_URL}/api/v1/user/password/update`,
       { currentPassword, newPassword, confirmNewPassword },
       {
         withCredentials: true,
@@ -174,7 +194,7 @@ export const updateProfile = (data) => async (dispatch) => {
   dispatch(userSlice.actions.updateProfileRequest());
   try {
     const response = await axios.put(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/user/me/profile/update",
+      `${BACKEND_URL}/api/v1/user/me/profile/update`,
       data,
       {
         withCredentials: true,
@@ -187,6 +207,22 @@ export const updateProfile = (data) => async (dispatch) => {
     dispatch(
       userSlice.actions.updateProfileFailed(error.response.data.message)
     );
+  }
+};
+
+export const deleteResume = (resumeId) => async (dispatch) => {
+  dispatch(userSlice.actions.deleteResumeRequest());
+  try {
+    const response = await axios.delete(
+      `${BACKEND_URL}/api/v1/user/me/resume/${resumeId}`,
+      {
+        withCredentials: true,
+      }
+    );
+    dispatch(userSlice.actions.deleteResumeSuccess(response.data.message));
+    dispatch(userSlice.actions.clearAllErrors());
+  } catch (error) {
+    dispatch(userSlice.actions.deleteResumeFailed(error.response.data.message));
   }
 };
 

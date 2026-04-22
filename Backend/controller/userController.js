@@ -5,6 +5,40 @@ import ErrorHandler from "../middlewares/error.js";
 import { generateToken } from "../utils/jwtToken.js";
 import crypto from "crypto";
 import { sendEmail } from "../utils/sendEmail.js";
+import { uploadToR2, deleteFromR2 } from "../utils/r2.js";
+
+const ensurePdfUrl = (url = "") => {
+  if (!url) return url;
+  if (url.toLowerCase().includes(".pdf")) return url;
+  if (url.includes("/raw/upload/")) return `${url}.pdf`;
+  return url;
+};
+
+const resolveResumeFromUser = (user, resumeId) => {
+  if (!user) return null;
+
+  if (resumeId === "legacy-resume") {
+    if (user?.resume?.url) {
+      return {
+        name: "Resume",
+        url: ensurePdfUrl(user.resume.url),
+      };
+    }
+    return null;
+  }
+
+  const fromArray = (user?.resumes || []).find(
+    (item) => item._id.toString() === resumeId
+  );
+  if (fromArray?.url) {
+    return {
+      name: fromArray.name || "Resume",
+      url: ensurePdfUrl(fromArray.url),
+    };
+  }
+
+  return null;
+};
 
 export const register = catchAsyncErrors(async (req, res, next) => {
   if (!req.files || Object.keys(req.files).length === 0) {
@@ -26,16 +60,9 @@ export const register = catchAsyncErrors(async (req, res, next) => {
   }
 
   //POSTING RESUME
-  const cloudinaryResponseForResume = await cloudinary.uploader.upload(
-    resume.tempFilePath,
-    { folder: "PORTFOLIO RESUME" }
-  );
-  if (!cloudinaryResponseForResume || cloudinaryResponseForResume.error) {
-    console.error(
-      "Cloudinary Error:",
-      cloudinaryResponseForResume.error || "Unknown Cloudinary error"
-    );
-    return next(new ErrorHandler("Failed to upload resume to Cloudinary", 500));
+  const r2ResponseForResume = await uploadToR2(resume);
+  if (!r2ResponseForResume || !r2ResponseForResume.url) {
+    return next(new ErrorHandler("Failed to upload resume to Cloudflare R2", 500));
   }
   const {
     fullName,
@@ -67,9 +94,16 @@ export const register = catchAsyncErrors(async (req, res, next) => {
       url: cloudinaryResponseForAvatar.secure_url, // Set your cloudinary secure_url here
     },
     resume: {
-      public_id: cloudinaryResponseForResume.public_id, // Set your cloudinary public_id here
-      url: cloudinaryResponseForResume.secure_url, // Set your cloudinary secure_url here
+      public_id: r2ResponseForResume.public_id,
+      url: r2ResponseForResume.url,
     },
+    resumes: [
+      {
+        name: "Resume",
+        public_id: r2ResponseForResume.public_id,
+        url: r2ResponseForResume.url,
+      },
+    ],
   });
   generateToken(user, "Registered!", 201, req, res);
 });
@@ -141,20 +175,59 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
     };
   }
 
-  if (req.files && req.files.resume) {
-    const resume = req.files.resume;
+  const hasMultipleResumes = req.files && req.files.resumes;
+  const hasLegacySingleResume = req.files && req.files.resume;
+
+  if (hasMultipleResumes || hasLegacySingleResume) {
     const user = await User.findById(req.user.id);
-    const resumeFileId = user.resume.public_id;
-    if (resumeFileId) {
-      await cloudinary.uploader.destroy(resumeFileId);
+
+    let resumeFiles = [];
+    let resumeNames = [];
+
+    if (hasMultipleResumes) {
+      resumeFiles = Array.isArray(req.files.resumes)
+        ? req.files.resumes
+        : [req.files.resumes];
+      try {
+        const parsedNames = JSON.parse(req.body.resumeNames || "[]");
+        resumeNames = Array.isArray(parsedNames) ? parsedNames : [];
+      } catch {
+        return next(new ErrorHandler("Invalid resume names payload", 400));
+      }
+    } else {
+      resumeFiles = [req.files.resume];
+      resumeNames = [req.body.resumeName || "Resume"];
     }
-    const newResume = await cloudinary.uploader.upload(resume.tempFilePath, {
-      folder: "PORTFOLIO RESUME",
-    });
-    newUserData.resume = {
-      public_id: newResume.public_id,
-      url: newResume.secure_url,
-    };
+
+    const uploadedResumes = [...(user.resumes || [])];
+
+    for (let i = 0; i < resumeFiles.length; i++) {
+      const file = resumeFiles[i];
+      if (!file) continue;
+
+      const isPdf =
+        file.mimetype === "application/pdf" ||
+        (file.name && file.name.toLowerCase().endsWith(".pdf"));
+      if (!isPdf) {
+        return next(new ErrorHandler("Only PDF resumes are allowed.", 400));
+      }
+
+      const uploaded = await uploadToR2(file);
+
+      uploadedResumes.push({
+        name: (resumeNames[i] || `Resume ${uploadedResumes.length + 1}`).trim(),
+        public_id: uploaded.public_id,
+        url: uploaded.url,
+      });
+    }
+
+    if (uploadedResumes.length > 0) {
+      newUserData.resumes = uploadedResumes;
+      newUserData.resume = {
+        public_id: uploadedResumes[0].public_id,
+        url: uploadedResumes[0].url,
+      };
+    }
   }
 
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
@@ -167,6 +240,95 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
     message: "Profile Updated!",
     user,
   });
+});
+
+export const deleteResume = catchAsyncErrors(async (req, res, next) => {
+  const { resumeId } = req.params;
+
+  const user = await User.findById(req.user.id);
+  if (!user) {
+    return next(new ErrorHandler("User not found.", 404));
+  }
+
+  let removedResume = null;
+
+  if (resumeId === "legacy-resume") {
+    if (!user?.resume?.public_id) {
+      return next(new ErrorHandler("Resume not found.", 404));
+    }
+
+    removedResume = {
+      public_id: user.resume.public_id,
+    };
+
+    user.resumes = [];
+  } else {
+    const resumeIndex = (user.resumes || []).findIndex(
+      (item) => item._id.toString() === resumeId
+    );
+
+    if (resumeIndex === -1) {
+      return next(new ErrorHandler("Resume not found.", 404));
+    }
+
+    [removedResume] = user.resumes.splice(resumeIndex, 1);
+  }
+
+  if (removedResume?.public_id) {
+    if (removedResume.public_id.startsWith("resumes/")) {
+      await deleteFromR2(removedResume.public_id).catch(() => {});
+    } else {
+      await cloudinary.uploader.destroy(removedResume.public_id, {
+        resource_type: "raw",
+      });
+    }
+  }
+
+  if (user.resumes.length > 0) {
+    user.resume = {
+      public_id: user.resumes[0].public_id,
+      url: user.resumes[0].url,
+    };
+  } else {
+    user.resume = { public_id: undefined, url: undefined };
+  }
+
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: "Resume deleted successfully.",
+    user,
+  });
+});
+
+export const viewMyResume = catchAsyncErrors(async (req, res, next) => {
+  const { resumeId } = req.params;
+  const user = await User.findById(req.user.id);
+
+  const resume = resolveResumeFromUser(user, resumeId);
+  if (!resume) {
+    return next(new ErrorHandler("Resume not found.", 404));
+  }
+
+  res.redirect(resume.url);
+});
+
+export const viewPortfolioResume = catchAsyncErrors(async (req, res, next) => {
+  const { resumeId } = req.params;
+  const hardcodedId = "683e24b80b536fa69e9a3a7c";
+  let user = await User.findById(hardcodedId);
+
+  if (!user) {
+    user = await User.findOne();
+  }
+
+  const resume = resolveResumeFromUser(user, resumeId);
+  if (!resume) {
+    return next(new ErrorHandler("Resume not found.", 404));
+  }
+
+  res.redirect(resume.url);
 });
 
 export const updatePassword = catchAsyncErrors(async (req, res, next) => {
@@ -193,8 +355,13 @@ export const updatePassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getUserForPortfolio = catchAsyncErrors(async (req, res, next) => {
-  const id = "683e24b80b536fa69e9a3a7c";
-  const user = await User.findById(id);
+  const hardcodedId = "683e24b80b536fa69e9a3a7c";
+  let user = await User.findById(hardcodedId);
+
+  if (!user) {
+    user = await User.findOne();
+  }
+
   res.status(200).json({
     success: true,
     user,

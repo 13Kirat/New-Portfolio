@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const Timeline = () => {
   const [timeline, setTimeline] = useState([]);
   useEffect(() => {
     const getMyTimeline = async () => {
       const { data } = await axios.get(
-        "https://new-portfolio-8kjr.onrender.com/api/v1/timeline/getall",
+        `${BACKEND_URL}/api/v1/timeline/getall`,
         { withCredentials: true }
       );
       setTimeline(data.timelines);

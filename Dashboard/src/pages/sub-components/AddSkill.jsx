@@ -28,7 +28,16 @@ const AddSkill = () => {
 
   const { loading, message, error } = useSelector((state) => state.skill);
   const dispatch = useDispatch();
+
+  const resetForm = () => {
+    setTitle("");
+    setProficiency("");
+    setSvg("");
+    setSvgPreview("");
+  };
+
   const handleAddNewSkill = (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
     formData.append("proficiency", proficiency);
@@ -43,10 +52,11 @@ const AddSkill = () => {
     }
     if (message) {
       toast.success(message);
+      resetForm();
       dispatch(resetSkillSlice());
       dispatch(getAllSkills());
     }
-  }, [dispatch, loading, error]);
+  }, [dispatch, loading, error, message]);
 
   return (
     <>
@@ -153,7 +163,6 @@ const AddSkill = () => {
             {!loading ? (
               <Button
                 type="submit"
-                onClick={() => handleAddNewSkill()}
                 className="w-full"
               >
                 Add Skill

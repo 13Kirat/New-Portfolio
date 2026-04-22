@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const skillSlice = createSlice({
   name: "skill",
   initialState: {
@@ -87,7 +89,7 @@ export const getAllSkills = () => async (dispatch) => {
   dispatch(skillSlice.actions.getAllSkillsRequest());
   try {
     const response = await axios.get(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/skill/getall",
+      `${BACKEND_URL}/api/v1/skill/getall`,
       { withCredentials: true }
     );
     dispatch(skillSlice.actions.getAllSkillsSuccess(response.data.skills));
@@ -103,7 +105,7 @@ export const addNewSkill = (data) => async (dispatch) => {
   dispatch(skillSlice.actions.addNewSkillRequest());
   try {
     const response = await axios.post(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/skill/add",
+      `${BACKEND_URL}/api/v1/skill/add`,
       data,
       {
         withCredentials: true,
@@ -123,7 +125,7 @@ export const updateSkill = (id, proficiency) => async (dispatch) => {
   dispatch(skillSlice.actions.updateSkillRequest());
   try {
     const response = await axios.put(
-      `https://new-portfolio-8kjr.onrender.com/api/v1/skill/update/${id}`,
+      `${BACKEND_URL}/api/v1/skill/update/${id}`,
       { proficiency },
       {
         withCredentials: true,
@@ -141,7 +143,7 @@ export const deleteSkill = (id) => async (dispatch) => {
   dispatch(skillSlice.actions.deleteSkillRequest());
   try {
     const response = await axios.delete(
-      `https://new-portfolio-8kjr.onrender.com/api/v1/skill/delete/${id}`,
+      `${BACKEND_URL}/api/v1/skill/delete/${id}`,
       {
         withCredentials: true,
       }

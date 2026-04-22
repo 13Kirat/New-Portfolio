@@ -1,12 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSelector } from "react-redux";
 import { Textarea } from "@/components/ui/textarea";
-import { Link } from "react-router-dom";
+import ResumeModal from "./ResumeModal";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const Profile = () => {
   const { user } = useSelector((state) => state.user);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedResume, setSelectedResume] = useState(null);
+
+  const resumes =
+    user?.resumes?.length > 0
+      ? user.resumes
+      : user?.resume?.url
+        ? [{ _id: "legacy-resume", name: "Resume", url: user.resume.url }]
+        : [];
+
+  const handleOpenResume = (resume) => {
+    setSelectedResume({
+      url: `${BACKEND_URL}/api/v1/user/me/resume/view/${resume._id || "legacy-resume"}`,
+      name: resume.name || "Resume"
+    });
+    setIsModalOpen(true);
+  };
+
   return (
     <>
       <div className="w-full h-full">
@@ -29,14 +49,18 @@ const Profile = () => {
                   />
                 </div>
                 <div className="grid gap-2 w-full sm:w-72">
-                  <Label>Resume</Label>
-                  <Link to={user && user.resume && user.resume.url} target="_blank">
-                    <img
-                      src={user && user.resume && user.resume.url}
-                      alt="avatar"
-                      className="w-full  h-auto sm:w-72 sm:h-72 rounded-2xl"
-                    />
-                  </Link>
+                  <Label>Resumes</Label>
+                  <div className="space-y-2">
+                    {resumes.map((resume, index) => (
+                      <span
+                        key={`${resume.url}-${index}`}
+                        onClick={() => handleOpenResume(resume)}
+                        className="text-sky-700 underline block cursor-pointer"
+                      >
+                        {resume.name || `Resume ${index + 1}`}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="grid gap-2">
@@ -83,6 +107,12 @@ const Profile = () => {
           </div>
         </div>
       </div>
+      <ResumeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        resumeUrl={selectedResume?.url}
+        resumeName={selectedResume?.name}
+      />
     </>
   );
 };

@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
+
 const messageSlice = createSlice({
   name: "messages",
   initialState: {
@@ -57,7 +59,7 @@ export const getAllMessages = () => async (dispatch) => {
   dispatch(messageSlice.actions.getAllMessagesRequest());
   try {
     const response = await axios.get(
-      "https://new-portfolio-8kjr.onrender.com/api/v1/message/getall",
+      `${BACKEND_URL}/api/v1/message/getall`,
       { withCredentials: true }
     );
     dispatch(
@@ -75,7 +77,7 @@ export const deleteMessage = (id) => async (dispatch) => {
   dispatch(messageSlice.actions.deleteMessageRequest());
   try {
     const response = await axios.delete(
-      `https://new-portfolio-8kjr.onrender.com/api/v1/message/delete/${id}`,
+      `${BACKEND_URL}/api/v1/message/delete/${id}`,
       {
         withCredentials: true,
       }

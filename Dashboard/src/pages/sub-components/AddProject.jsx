@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,11 @@ import {
 import SpecialLoadingButton from "./SpecialLoadingButton";
 
 const AddProject = () => {
+  const CUSTOM_DOMAIN_VALUE = "__CUSTOM_DOMAIN__";
+  const CUSTOM_CATEGORY_VALUE = "__CUSTOM_CATEGORY__";
+  const CUSTOM_STACK_VALUE = "__CUSTOM_STACK__";
+  const CUSTOM_STATUS_VALUE = "__CUSTOM_STATUS__";
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [projectBanner, setProjectBanner] = useState("");
@@ -27,7 +32,14 @@ const AddProject = () => {
   const [projectLink, setProjectLink] = useState("");
   const [technologies, setTechnologies] = useState("");
   const [stack, setStack] = useState("");
-  const [deployed, setDeployed] = useState("");
+  const [status, setStatus] = useState("");
+  const [domain, setDomain] = useState("");
+  const [category, setCategory] = useState("");
+  const [visible, setVisible] = useState("true");
+  const [customDomain, setCustomDomain] = useState("");
+  const [customCategory, setCustomCategory] = useState("");
+  const [customStack, setCustomStack] = useState("");
+  const [customStatus, setCustomStatus] = useState("");
 
   const handleSvg = (e) => {
     const file = e.target.files[0];
@@ -39,18 +51,119 @@ const AddProject = () => {
     };
   };
 
-  const { loading, error, message } = useSelector((state) => state.project);
+  const { loading, error, message, projects } = useSelector(
+    (state) => state.project
+  );
+
+  const domainOptions = useMemo(() => {
+    return [
+      ...new Set(
+        (projects || [])
+          .map((project) => project?.domain)
+          .filter(
+            (value) =>
+              value &&
+              value.trim() &&
+              value !== CUSTOM_DOMAIN_VALUE
+          )
+      ),
+    ];
+  }, [projects]);
+
+  const categoryOptions = useMemo(() => {
+    return [
+      ...new Set(
+        (projects || [])
+          .map((project) => project?.category)
+          .filter(
+            (value) =>
+              value &&
+              value.trim() &&
+              value !== CUSTOM_CATEGORY_VALUE
+          )
+      ),
+    ];
+  }, [projects]);
+
+  const stackOptions = useMemo(() => {
+    return [
+      ...new Set(
+        (projects || [])
+          .map((project) => project?.stack)
+          .filter(
+            (value) =>
+              value &&
+              value.trim() &&
+              value !== CUSTOM_STACK_VALUE
+          )
+      ),
+    ];
+  }, [projects]);
+
+  const statusOptions = useMemo(() => {
+    return [
+      ...new Set(
+        (projects || [])
+          .map((project) => project?.status)
+          .filter(
+            (value) =>
+              value &&
+              value.trim() &&
+              value !== CUSTOM_STATUS_VALUE
+          )
+      ),
+    ];
+  }, [projects]);
+
   const dispatch = useDispatch();
+
+  const resetForm = () => {
+    setTitle("");
+    setDescription("");
+    setProjectBanner("");
+    setProjectBannerPreview("");
+    setGitRepoLink("");
+    setProjectLink("");
+    setTechnologies("");
+    setStack("");
+    setStatus("");
+    setDomain("");
+    setCategory("");
+    setCustomDomain("");
+    setCustomCategory("");
+    setCustomStack("");
+    setCustomStatus("");
+  };
+
   const handleAddNewProject = (e) => {
     e.preventDefault();
+    const finalDomain =
+      domain === CUSTOM_DOMAIN_VALUE ? customDomain.trim() : domain.trim();
+    const finalCategory =
+      category === CUSTOM_CATEGORY_VALUE
+        ? customCategory.trim()
+        : category.trim();
+    const finalStack =
+      stack === CUSTOM_STACK_VALUE ? customStack.trim() : stack.trim();
+    const finalStatus =
+      status === CUSTOM_STATUS_VALUE ? customStatus.trim() : status.trim();
+
+    if (!finalDomain || !finalCategory || !finalStack || !finalStatus) {
+      toast.error("Please fill domain, category, stack and status.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
+    formData.append("domain", finalDomain);
+    formData.append("category", finalCategory);
     formData.append("gitRepoLink", gitRepoLink);
     formData.append("projectLink", projectLink);
     formData.append("technologies", technologies);
-    formData.append("stack", stack);
-    formData.append("deployed", deployed);
+    formData.append("stack", finalStack);
+    formData.append("status", finalStatus);
+    formData.append("visible", visible);
     formData.append("projectBanner", projectBanner);
     dispatch(addNewProject(formData));
   };
@@ -61,6 +174,7 @@ const AddProject = () => {
     }
     if (message) {
       toast.success(message);
+      resetForm();
       dispatch(resetProjectSlice());
       dispatch(getAllProjects());
     }
@@ -125,48 +239,158 @@ const AddProject = () => {
                 </div>
                 <div className="w-full sm:col-span-4">
                   <label className="block text-sm font-medium leading-6 text-gray-900">
-                    Stack
+                    Domain
                   </label>
                   <div className="mt-2">
                     <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                      <Select
-                        value={stack}
-                        onValueChange={(selectedValue) =>
-                          setStack(selectedValue)
-                        }
-                      >
+                      <Select value={domain} onValueChange={setDomain}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Project Stack" />
+                          <SelectValue placeholder="Select Project Domain" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Full Stack">Full Stack</SelectItem>
-                          <SelectItem value="Mern">MERN</SelectItem>
-                          <SelectItem value="Mean">MEAN</SelectItem>
-                          <SelectItem value="Next.JS">NEXT.JS</SelectItem>
-                          <SelectItem value="React.JS">REACT.JS</SelectItem>
+                          {domainOptions.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value={CUSTOM_DOMAIN_VALUE}>
+                            + Add New Domain
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
+                    {domain === CUSTOM_DOMAIN_VALUE && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="block w-full border rounded-md bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-indigo-600"
+                          placeholder="Enter new domain"
+                          value={customDomain}
+                          onChange={(e) => setCustomDomain(e.target.value)}
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="w-full sm:col-span-4">
                   <label className="block text-sm font-medium leading-6 text-gray-900">
-                    Deployed
+                    Category
                   </label>
                   <div className="mt-2">
                     <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
-                      <Select
-                        value={deployed}
-                        onValueChange={(selectedValue) =>
-                          setDeployed(selectedValue)
-                        }
-                      >
+                      <Select value={category} onValueChange={setCategory}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Is this project deployed?" />
+                          <SelectValue placeholder="Select Project Category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Yes">Yes</SelectItem>
-                          <SelectItem value="No">No</SelectItem>
+                          {categoryOptions.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value={CUSTOM_CATEGORY_VALUE}>
+                            + Add New Category
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {category === CUSTOM_CATEGORY_VALUE && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="block w-full border rounded-md bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-indigo-600"
+                          placeholder="Enter new category"
+                          value={customCategory}
+                          onChange={(e) => setCustomCategory(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="w-full sm:col-span-4">
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Stack
+                  </label>
+                  <div className="mt-2">
+                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                      <Select value={stack} onValueChange={setStack}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Project Stack" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {stackOptions.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value={CUSTOM_STACK_VALUE}>
+                            + Add New Stack
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {stack === CUSTOM_STACK_VALUE && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="block w-full border rounded-md bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-indigo-600"
+                          placeholder="Enter new stack"
+                          value={customStack}
+                          onChange={(e) => setCustomStack(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="w-full sm:col-span-4">
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Status
+                  </label>
+                  <div className="mt-2">
+                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600">
+                      <Select value={status} onValueChange={setStatus}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Project Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusOptions.map((item) => (
+                            <SelectItem key={item} value={item}>
+                              {item}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value={CUSTOM_STATUS_VALUE}>
+                            + Add New Status
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {status === CUSTOM_STATUS_VALUE && (
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          className="block w-full border rounded-md bg-transparent py-1.5 px-2 text-gray-900 placeholder:text-gray-400 focus:ring-1 focus:ring-indigo-600"
+                          placeholder="Enter new status"
+                          value={customStatus}
+                          onChange={(e) => setCustomStatus(e.target.value)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="w-full sm:col-span-4">
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Project Visibility
+                  </label>
+                  <div className="mt-2">
+                    <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 bg-white">
+                      <Select value={visible} onValueChange={setVisible}>
+                        <SelectTrigger className="w-full px-3 py-2">
+                          <SelectValue placeholder="Select Project Visibility" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          <SelectItem value="true">Visible (Publicly shown on Portfolio)</SelectItem>
+                          <SelectItem value="false">Hidden (Draft/Internal Only)</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -275,7 +499,7 @@ const AddProject = () => {
             ) : (
               <button
                 type="submit"
-                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-56"
+                className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 w-56"
               >
                 Add Project
               </button>

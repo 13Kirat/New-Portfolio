@@ -164,7 +164,7 @@ const Dashboard = () => {
                             Stack
                           </TableHead>
                           <TableHead className="hidden md:table-cell">
-                            Deployed
+                            Status
                           </TableHead>
                           <TableHead className="md:table-cell">
                             Update
@@ -190,7 +190,7 @@ const Dashboard = () => {
                                     className="text-xs"
                                     variant="secondary"
                                   >
-                                    {element.deployed}
+                                    {element.status || "-"}
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="md:table-cell">
@@ -266,7 +266,7 @@ const Dashboard = () => {
                       </TableHeader>
                       <TableBody>
                         {softwareApplications &&
-                        softwareApplications.length > 0 ? (
+                          softwareApplications.length > 0 ? (
                           softwareApplications.map((element) => {
                             return (
                               <TableRow className="bg-accent" key={element._id}>

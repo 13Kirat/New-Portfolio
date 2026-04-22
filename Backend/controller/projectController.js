@@ -11,20 +11,24 @@ export const addNewProject = catchAsyncErrors(async (req, res, next) => {
   const {
     title,
     description,
+    domain,
+    category,
     gitRepoLink,
     projectLink,
     stack,
+    status,
+    visible,
     technologies,
-    deployed,
   } = req.body;
   if (
     !title ||
     !description ||
-    !gitRepoLink ||
+    !domain ||
+    !category ||
     !projectLink ||
     !stack ||
-    !technologies ||
-    !deployed
+    !status ||
+    !technologies
   ) {
     return next(new ErrorHandler("Please Provide All Details!", 400));
   }
@@ -42,11 +46,14 @@ export const addNewProject = catchAsyncErrors(async (req, res, next) => {
   const project = await Project.create({
     title,
     description,
+    domain,
+    category,
     gitRepoLink,
     projectLink,
     stack,
+    status,
+    visible: visible === "false" ? false : true,
     technologies,
-    deployed,
     projectBanner: {
       public_id: cloudinaryResponse.public_id, // Set your cloudinary public_id here
       url: cloudinaryResponse.secure_url, // Set your cloudinary secure_url here
@@ -63,9 +70,12 @@ export const updateProject = catchAsyncErrors(async (req, res, next) => {
   const newProjectData = {
     title: req.body.title,
     description: req.body.description,
+    domain: req.body.domain,
+    category: req.body.category,
     stack: req.body.stack,
+    status: req.body.status,
+    visible: req.body.visible === "false" ? false : true,
     technologies: req.body.technologies,
-    deployed: req.body.deployed,
     projectLink: req.body.projectLink,
     gitRepoLink: req.body.gitRepoLink,
   };
@@ -117,7 +127,9 @@ export const deleteProject = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const getAllProjects = catchAsyncErrors(async (req, res, next) => {
-  const projects = await Project.find();
+  const includeHidden = req.query.includeHidden === "true";
+  const filter = includeHidden ? {} : { visible: true };
+  const projects = await Project.find(filter);
   res.status(200).json({
     success: true,
     projects,
@@ -128,6 +140,15 @@ export const getSingleProject = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
   try {
     const project = await Project.findById(id);
+    if (!project) {
+      return next(new ErrorHandler("Project not found.", 404));
+    }
+
+    const includeHidden = req.query.includeHidden === "true";
+    if (!includeHidden && project.visible === false) {
+      return next(new ErrorHandler("Project not found.", 404));
+    }
+
     res.status(200).json({
       success: true,
       project,
