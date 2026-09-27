@@ -19,7 +19,7 @@ app.set('trust proxy', true);
 
 app.use(
     cors({
-        origin: [process.env.PORTFOLIO_URL, process.env.DASHBOARD_URL, "http://localhost:5173", "http://localhost:5174"],
+        origin: [process.env.PORTFOLIO_URL, process.env.DASHBOARD_URL, "https://kirat-portfolio.vercel.app" , "https://admin-kirat-portfolio.vercel.app" , "http://localhost:5173", "http://localhost:5174"],
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     })
