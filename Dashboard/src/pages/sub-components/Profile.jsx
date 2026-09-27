@@ -55,7 +55,7 @@ const Profile = () => {
                       <span
                         key={`${resume.url}-${index}`}
                         onClick={() => handleOpenResume(resume)}
-                        className="text-sky-700 underline block cursor-pointer"
+                        className="text-primary underline block cursor-pointer font-mono text-sm"
                       >
                         {resume.name || `Resume ${index + 1}`}
                       </span>

@@ -2,6 +2,7 @@ import express from "express";
 import {
   addNewProject,
   deleteProject,
+  generateProjectBanner,
   getAllProjects,
   getSingleProject,
   updateProject,
@@ -10,6 +11,7 @@ import { isAuthenticated } from "../middlewares/auth.js";
 
 const router = express.Router();
 
+router.post("/generate-banner", isAuthenticated, generateProjectBanner);
 router.post("/add", isAuthenticated, addNewProject);
 router.delete("/delete/:id", isAuthenticated, deleteProject);
 router.put("/update/:id", isAuthenticated, updateProject);

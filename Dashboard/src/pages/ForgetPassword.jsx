@@ -18,7 +18,8 @@ const ForgotPassword = () => {
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
 
-  const handleForgotPassword = (email) => {
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
     dispatch(forgotPassword(email));
   };
 
@@ -36,13 +37,15 @@ const ForgotPassword = () => {
   }, [dispatch, isAuthenticated, error, loading]);
 
   return (
-    <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2 xl:min-h-[100vh]">
-      <div className=" min-h-[100vh] flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+    <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2">
+      <div className="min-h-[100vh] flex items-center justify-center py-12 px-5">
+        <form onSubmit={handleForgotPassword} className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Forgot Password</h1>
-            <p className="text-balance text-muted-foreground">
-              Enter your email to request for reset password
+            <h1 className="font-mono text-3xl font-bold">
+              <span className="text-gradient">Forgot</span> Password
+            </h1>
+            <p className="text-balance text-muted-foreground font-mono text-sm">
+              // enter your email to request a reset link
             </p>
           </div>
           <div className="grid gap-4">
@@ -58,30 +61,38 @@ const ForgotPassword = () => {
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Link
-                  to="/login"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Remember your password?
-                </Link>
-              </div>
-            </div>
-            {!loading ? (
-              <Button
-                onClick={() => handleForgotPassword(email)}
-                className="w-full"
+              <Link
+                to="/login"
+                className="ml-auto inline-block text-sm text-primary underline"
               >
-                Forgot Password
-              </Button>
-            ) : (
+                Remember your password?
+              </Link>
+            </div>
+            {loading ? (
               <SpecialLoadingButton content={"Requesting"} />
+            ) : (
+              <Button type="submit" className="w-full">
+                Send Reset Link
+              </Button>
             )}
           </div>
-        </div>
+        </form>
       </div>
-      <div className="flex justify-center items-center bg-muted">
-        <img src="/forgot.png" alt="login" />
+      <div className="hidden lg:flex justify-center items-center bg-card/30 border-l border-border p-10">
+        <div className="terminal-window w-full max-w-sm">
+          <div className="terminal-window-bar">
+            <span className="terminal-window-dot bg-[#ff5f56]" />
+            <span className="terminal-window-dot bg-[#ffbd2e]" />
+            <span className="terminal-window-dot bg-[#27c93f]" />
+            <span className="ml-2 font-mono text-xs text-muted-foreground">recovery.sh</span>
+          </div>
+          <div className="p-5 font-mono text-sm text-muted-foreground space-y-2">
+            <p>$ password-reset --request</p>
+            <p className="text-primary">Checking account...</p>
+            <p>$ mail --send reset-link</p>
+            <p className="text-gradient">Check your inbox.</p>
+          </div>
+        </div>
       </div>
     </div>
   );

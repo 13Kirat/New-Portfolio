@@ -183,7 +183,7 @@ const UpdateProfile = () => {
                             }`}
                           target="_blank"
                           rel="noreferrer"
-                          className="block text-sm text-sky-700 underline"
+                          className="block text-sm text-primary underline font-mono"
                         >
                           {resume.name || `Resume ${index + 1}`}
                         </a>
@@ -216,7 +216,7 @@ const UpdateProfile = () => {
                           onChange={(e) => updateResumeFile(index, e.target.files?.[0])}
                         />
                         {entry.preview && (
-                          <p className="mt-2 text-xs text-gray-600">PDF selected</p>
+                          <p className="mt-2 text-xs text-muted-foreground">PDF selected</p>
                         )}
                         {resumeEntries.length > 1 && (
                           <Button

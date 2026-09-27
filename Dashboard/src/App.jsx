@@ -1,14 +1,19 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import HomePage from './pages/HomePage';
+import DashboardLayout from './components/DashboardLayout'
+import DashboardOverview from './pages/sub-components/Dashboard'
 import Login from './pages/Login';
 import ForgetPassword from './pages/ForgetPassword';
 import ResetPassword from './pages/ResetPassword';
-import ManageSkills from './pages/ManageSkills';
-import ManageTimeline from './pages/ManageTimeline';
-import ManageProjects from './pages/ManageProjects';
+import Skills from './pages/Skills';
+import Timeline from './pages/Timeline';
+import Projects from './pages/Projects';
+import Apps from './pages/Apps';
 import ViewProject from './pages/ViewProject';
+import AddProject from './pages/sub-components/AddProject';
 import UpdateProject from './pages/UpdateProject';
+import Messages from './pages/sub-components/Messages';
+import Account from './pages/sub-components/Account';
 import { ToastContainer} from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css"
 import { useDispatch } from 'react-redux';
@@ -34,15 +39,22 @@ export default function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/password/forgot" element={<ForgetPassword />} />
         <Route path="/password/reset/:token" element={<ResetPassword />} />
-        <Route path="/manage/skills" element={<ManageSkills />} />
-        <Route path="/manage/timeline" element={<ManageTimeline />} />
-        <Route path="/manage/projects" element={<ManageProjects />} />
-        <Route path="/view/project/:id" element={<ViewProject />} />
-        <Route path="/update/project/:id" element={<UpdateProject />} />
+
+        <Route element={<DashboardLayout />}>
+          <Route path="/" element={<DashboardOverview />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/new" element={<AddProject />} />
+          <Route path="/projects/:id" element={<ViewProject />} />
+          <Route path="/projects/:id/edit" element={<UpdateProject />} />
+          <Route path="/skills" element={<Skills />} />
+          <Route path="/apps" element={<Apps />} />
+          <Route path="/timeline" element={<Timeline />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/account" element={<Account />} />
+        </Route>
       </Routes>
       <ToastContainer position="bottom-right" theme="dark" />
     </>

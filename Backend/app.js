@@ -11,6 +11,7 @@ import timelineRouter from "./routes/timelineRouter.js";
 import softwareApplicationRouter from "./routes/softwareApplicationRouter.js";
 import skillRouter from "./routes/skillRouter.js";
 import projectRouter from "./routes/projectRouter.js";
+import aiRouter from "./routes/aiRouter.js";
 
 const app = express();
 dotenv.config({ path: "./config/config.env" });
@@ -42,6 +43,7 @@ app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/skill", skillRouter);
 app.use("/api/v1/softwareapplication", softwareApplicationRouter);
 app.use("/api/v1/project", projectRouter);
+app.use("/api/v1/ai", aiRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Backend is up and running" });

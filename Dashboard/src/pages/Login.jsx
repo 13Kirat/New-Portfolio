@@ -7,19 +7,19 @@ import { useEffect, useState } from "react";
 import { clearAllUserErrors, login } from "@/store/slices/userSlice";
 import { toast } from "react-toastify";
 import SpecialLoadingButton from "./sub-components/SpecialLoadingButton";
-import { Eye, EyeOff } from "lucide-react";
+import PasswordInput from "@/components/PasswordInput";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const { loading, isAuthenticated, error } = useSelector(
     (state) => state.user
   );
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault();
     dispatch(login(email, password));
   };
 
@@ -34,13 +34,15 @@ const Login = () => {
   }, [dispatch, isAuthenticated, error, loading]);
 
   return (
-    <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2 xl:min-h-[100vh]">
-      <div className=" min-h-[100vh] flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+    <div className="w-full lg:grid lg:min-h-[100vh] lg:grid-cols-2">
+      <div className="min-h-[100vh] flex items-center justify-center py-12 px-5">
+        <form onSubmit={handleLogin} className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
-            <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+            <h1 className="font-mono text-3xl font-bold">
+              <span className="text-gradient">Login</span>
+            </h1>
+            <p className="text-balance text-muted-foreground font-mono text-sm">
+              // enter your credentials to access the dashboard
             </p>
           </div>
           <div className="grid gap-4">
@@ -60,48 +62,43 @@ const Login = () => {
                 <Label>Password</Label>
                 <Link
                   to="/password/forgot"
-                  className="ml-auto inline-block text-sm underline"
+                  className="ml-auto inline-block text-sm text-primary underline"
                 >
                   Forgot your password?
                 </Link>
               </div>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             {loading ? (
-              <SpecialLoadingButton content={"Loggin In"} />
+              <SpecialLoadingButton content={"Logging In"} />
             ) : (
-              <Button
-                onClick={() => handleLogin(email, password)}
-                className="w-full"
-              >
+              <Button type="submit" className="w-full">
                 Login
               </Button>
             )}
           </div>
-        </div>
+        </form>
       </div>
-      <div className="flex justify-center items-center bg-muted">
-        <img src="/login.png" alt="login" />
+      <div className="hidden lg:flex justify-center items-center bg-card/30 border-l border-border p-10">
+        <div className="terminal-window w-full max-w-sm">
+          <div className="terminal-window-bar">
+            <span className="terminal-window-dot bg-[#ff5f56]" />
+            <span className="terminal-window-dot bg-[#ffbd2e]" />
+            <span className="terminal-window-dot bg-[#27c93f]" />
+            <span className="ml-2 font-mono text-xs text-muted-foreground">session.sh</span>
+          </div>
+          <div className="p-5 font-mono text-sm text-muted-foreground space-y-2">
+            <p>$ ssh admin@dashboard</p>
+            <p className="text-primary">Authenticating...</p>
+            <p>$ whoami</p>
+            <p>&gt; Gurkirat Singh</p>
+            <p>$ access --grant portfolio-dashboard</p>
+            <p className="text-gradient">Welcome back.</p>
+          </div>
+        </div>
       </div>
     </div>
   );

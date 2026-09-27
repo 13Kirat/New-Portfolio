@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import PasswordInput from "@/components/PasswordInput";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
@@ -50,24 +50,21 @@ const Profile = () => {
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label>Current Password</Label>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
                 <Label>New Password</Label>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
                 <Label>Confirm New Password</Label>
-                <Input
-                  type="password"
+                <PasswordInput
                   value={confirmNewPassword}
                   onChange={(e) => setConfirmNewPassword(e.target.value)}
                 />
