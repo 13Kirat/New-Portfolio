@@ -10,15 +10,31 @@ import Contact from "./miniComponents/Contact";
 
 const Home = () => {
   return (
-    <article className="px-5 mt-10 sm:mt-14 md:mt-16 lg:mt-24 xl:mt-32 sm:mx-auto w-full max-w-[1050px] flex flex-col gap-14">
-      <Hero />
-      <Timeline />
-      <About />
-      <Skills />
-      <Portfolio />
-      <MyApps />
-      <Contact />
-    </article>
+    <ThemeProvider defaultTheme="dark" storageKey="portfolio-theme">
+      <article className="relative px-5 pt-24 sm:pt-28 md:pt-32 sm:mx-auto w-full max-w-[1100px] flex flex-col gap-24 sm:gap-32">
+        <section id="hero">
+          <Hero />
+        </section>
+        <section id="about" className="scroll-mt-24">
+          <About />
+        </section>
+        <section id="skills" className="scroll-mt-24">
+          <Skills />
+        </section>
+        <section id="experience" className="scroll-mt-24">
+          <Timeline />
+        </section>
+        <section id="projects" className="scroll-mt-24">
+          <Portfolio />
+        </section>
+        <section id="apps" className="scroll-mt-24">
+          <MyApps />
+        </section>
+        <section id="contact" className="scroll-mt-24">
+          <Contact />
+        </section>
+      </article>
+    </ThemeProvider>
   );
 };
 

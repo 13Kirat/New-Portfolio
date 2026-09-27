@@ -1,5 +1,8 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import SectionHeading from "@/components/SectionHeading";
+import Reveal from "@/components/Reveal";
+import { sortTimelineByRecency } from "@/lib/parseTimelineDate";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
@@ -11,41 +14,34 @@ const Timeline = () => {
         `${BACKEND_URL}/api/v1/timeline/getall`,
         { withCredentials: true }
       );
-      setTimeline(data.timelines);
+      setTimeline(sortTimelineByRecency(data.timelines));
     };
     getMyTimeline();
   }, []);
+
   return (
-    <div>
-      <h1 className="overflow-x-hidden text-[2rem] sm:text-[1.75rem] md:text-[2.2rem] lg:text-[2.8rem] mb-4 font-extrabold">Timeline</h1>
-      <ol className="relative border-s border-gray-200 dark:border-gray-700">
+    <div className="w-full flex flex-col gap-10">
+      <SectionHeading kicker="where i've been" title="EXPERI" accent="ENCE" />
+      <ol className="relative border-s-2 border-primary/20 ml-3">
         {timeline &&
-          timeline.map((element) => {
-            return (
-              <li className="mb-10 ms-6" key={element?._id}>
-                <span className="absolute flex items-center justify-center w-6 h-6 bg-blue-100 rounded-full -start-3 ring-8 ring-white dark:ring-gray-900 dark:bg-blue-900">
-                  <svg
-                    className="w-2.5 h-2.5 text-blue-800 dark:text-blue-300"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                  </svg>
-                </span>
-                <h3 className="mb-1 text-lg font-semibold text-gray-900 dark:text-white">
+          timeline.map((element, i) => (
+            <Reveal key={element?._id} delay={(i % 8) * 0.05} className="mb-10 ms-8 relative">
+              <span className="absolute -start-[41px] flex items-center justify-center w-6 h-6 rounded-full bg-background border-2 border-primary">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              </span>
+              <div className="terminal-window p-4 sm:p-5">
+                <h3 className="font-mono text-base sm:text-lg font-semibold text-foreground">
                   {element?.title}
                 </h3>
-                <time className="block mb-2 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">
-                  {element?.timeline?.from} - {element?.timeline?.to ? element?.timeline?.to : "Present"}
+                <time className="block mb-2 font-mono text-xs text-primary/80">
+                  {element?.timeline?.from} — {element?.timeline?.to ? element?.timeline?.to : "Present"}
                 </time>
-                <p className="text-base font-normal text-gray-500 dark:text-gray-400">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   {element?.description}
                 </p>
-              </li>
-            );
-          })}
+              </div>
+            </Reveal>
+          ))}
       </ol>
     </div>
   );
