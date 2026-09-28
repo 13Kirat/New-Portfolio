@@ -5,7 +5,7 @@ import Reveal from "@/components/Reveal";
 import IconCard from "@/components/IconCard";
 import { useIsDesktop } from "@/lib/useIsDesktop";
 
-const AppsCarousel = lazy(() => import("@/components/three/AppsCarousel"));
+const AppsConstellation = lazy(() => import("@/components/three/AppsConstellation"));
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
@@ -33,10 +33,10 @@ const MyApps = () => {
       {isDesktop ? (
         <Suspense
           fallback={
-            <div className="w-full h-[380px] sm:h-[440px] lg:h-[500px] rounded-2xl border border-border bg-card/30 animate-pulse" />
+            <div className="w-full h-[420px] sm:h-[480px] lg:h-[540px] rounded-2xl border border-border bg-card/30 animate-pulse" />
           }
         >
-          <AppsCarousel apps={apps} />
+          <AppsConstellation apps={apps} />
         </Suspense>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
