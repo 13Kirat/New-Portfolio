@@ -17,9 +17,25 @@ const app = express();
 dotenv.config({ path: "./config/config.env" });
 app.set('trust proxy', true);
 
+const allowedOrigins = [
+    process.env.PORTFOLIO_URL,
+    process.env.DASHBOARD_URL,
+    "https://kirat-portfolio.vercel.app",
+    "https://admin-kirat-portfolio.vercel.app",
+];
+const localhostOriginPattern = /^http:\/\/localhost:\d+$/;
+
 app.use(
     cors({
-        origin: [process.env.PORTFOLIO_URL, process.env.DASHBOARD_URL, "https://kirat-portfolio.vercel.app" , "https://admin-kirat-portfolio.vercel.app" , "http://localhost:5173", "http://localhost:5174"],
+        origin: (origin, callback) => {
+            // Allow non-browser requests (no Origin header) and any localhost
+            // port, so a dev server that lands on a different port than usual
+            // (e.g. 5173 already taken) doesn't silently get CORS-blocked.
+            if (!origin || allowedOrigins.includes(origin) || localhostOriginPattern.test(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error("Not allowed by CORS"));
+        },
         methods: ["GET", "POST", "PUT", "DELETE"],
         credentials: true,
     })

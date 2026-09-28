@@ -5,17 +5,23 @@ import { sendEmail } from "../utils/sendEmail.js";
 import { sendWhatsAppContactNotification } from "../utils/whatsapp.js";
 
 export const sendMessage = catchAsyncErrors(async (req, res, next) => {
-  const { senderName, subject, message } = req.body;
+  const { senderName, subject, message, email, phone } = req.body;
   if (!senderName || !subject || !message) {
     return next(new ErrorHandler("Please Fill Full Form!", 400));
   }
-  const data = await Message.create({ senderName, subject, message });
+  const data = await Message.create({ senderName, subject, message, email, phone });
+
+  const contactLines = [
+    email && `Email: ${email}`,
+    phone && `Phone: ${phone}`,
+  ].filter(Boolean);
+  const contactInfo = contactLines.length ? `\n\n${contactLines.join("\n")}` : "";
 
   try {
     await sendEmail({
       email: "gs9965416@gmail.com",
       subject: `New Portfolio Message: ${subject}`,
-      message: `You have received a new message from ${senderName} via your portfolio contact form.\n\nSubject: ${subject}\n\nMessage:\n${message}`,
+      message: `You have received a new message from ${senderName} via your portfolio contact form.\n\nSubject: ${subject}\n\nMessage:\n${message}${contactInfo}`,
     });
   } catch (error) {
     console.error("Email Sending Error:", error);
@@ -23,7 +29,14 @@ export const sendMessage = catchAsyncErrors(async (req, res, next) => {
   }
 
   try {
-    await sendWhatsAppContactNotification({ senderName, subject, message });
+    // Fold email/phone into the message body rather than the approved
+    // template's parameters, so adding them doesn't require re-submitting
+    // the template for another Meta review cycle.
+    await sendWhatsAppContactNotification({
+      senderName,
+      subject,
+      message: `${message}${contactInfo}`,
+    });
   } catch (error) {
     console.error("WhatsApp Notification Error:", error.message);
     // Same as email above — the message is already saved, don't fail the request over this.

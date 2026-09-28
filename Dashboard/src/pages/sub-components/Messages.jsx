@@ -46,6 +46,16 @@ const Messages = () => {
               <p className="font-mono text-sm">
                 <span className="text-primary">sender:</span> {element.senderName}
               </p>
+              {element.email && (
+                <p className="font-mono text-sm">
+                  <span className="text-primary">email:</span> {element.email}
+                </p>
+              )}
+              {element.phone && (
+                <p className="font-mono text-sm">
+                  <span className="text-primary">phone:</span> {element.phone}
+                </p>
+              )}
               <p className="font-mono text-sm">
                 <span className="text-primary">subject:</span> {element.subject}
               </p>

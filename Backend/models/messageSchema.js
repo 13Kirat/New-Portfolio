@@ -13,6 +13,14 @@ const messageSchema = new mongoose.Schema({
     type: String,
     minLength: [2, "Message Must Contain At Least 2 Characters!"],
   },
+  email: {
+    type: String,
+    trim: true,
+  },
+  phone: {
+    type: String,
+    trim: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

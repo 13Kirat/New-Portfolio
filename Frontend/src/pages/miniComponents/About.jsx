@@ -6,7 +6,14 @@ import CodeLeak from "@/components/CodeLeak";
 const About = () => {
   return (
     <div className="relative w-full flex flex-col gap-12">
-      <CodeLeak count={3} seed={2} />
+      <CodeLeak
+        count={2}
+        seed={2}
+        positions={[
+          { top: "0%", left: "0%", rotate: -6 },
+          { top: "0%", right: "0%", rotate: 5 },
+        ]}
+      />
       <SectionHeading kicker="who am i" title="ABOUT" accent="ME" />
 
       <div className="relative grid md:grid-cols-2 gap-10 items-center">

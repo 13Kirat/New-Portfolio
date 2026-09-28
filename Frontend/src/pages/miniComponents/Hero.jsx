@@ -56,7 +56,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="relative -mt-24 sm:-mt-28 md:-mt-32 pt-32 sm:pt-40 pb-16 sm:pb-24 overflow-hidden min-h-[92vh] flex items-center">
+    <div className="relative -mt-24 sm:-mt-28 md:-mt-32 pt-32 sm:pt-40 pb-16 sm:pb-24 min-h-[92vh] flex items-center">
       <div className="absolute inset-0 w-screen left-1/2 -translate-x-1/2 -z-10">
         <HeroCanvas />
         <div className="absolute inset-0 hero-vignette" />

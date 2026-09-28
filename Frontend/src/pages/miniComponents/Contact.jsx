@@ -12,6 +12,8 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const Contact = () => {
   const [senderName, setSenderName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,7 @@ const Contact = () => {
     await axios
       .post(
         `${BACKEND_URL}/api/v1/message/send`,
-        { senderName, subject, message },
+        { senderName, email, phone, subject, message },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
@@ -31,6 +33,8 @@ const Contact = () => {
       .then((res) => {
         toast.success(res.data.message);
         setSenderName("");
+        setEmail("");
+        setPhone("");
         setSubject("");
         setMessage("");
         setLoading(false);
@@ -71,6 +75,30 @@ const Contact = () => {
                 onChange={(e) => setSenderName(e.target.value)}
                 placeholder="Your Name"
               />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-5">
+              <div className="flex flex-col gap-2">
+                <Label className="font-mono text-sm text-muted-foreground">
+                  Email <span className="text-muted-foreground/60">(optional)</span>
+                </Label>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label className="font-mono text-sm text-muted-foreground">
+                  Phone <span className="text-muted-foreground/60">(optional)</span>
+                </Label>
+                <Input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                />
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               <Label className="font-mono text-sm text-muted-foreground">Subject</Label>

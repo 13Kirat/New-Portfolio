@@ -125,6 +125,7 @@
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 5rem;
+    overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground;
@@ -133,6 +134,8 @@
       radial-gradient(circle at 15% 0%, oklch(0.82 0.19 155 / 6%), transparent 40%),
       radial-gradient(circle at 85% 20%, oklch(0.78 0.14 200 / 6%), transparent 40%);
     background-attachment: fixed;
+    overflow-x: hidden;
+    width: 100%;
   }
   h1, h2, h3, h4, .font-mono-heading {
     font-family: var(--font-mono);
