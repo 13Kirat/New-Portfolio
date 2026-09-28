@@ -1,6 +1,7 @@
 import React, { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Billboard, Line, OrbitControls, Text, useTexture } from "@react-three/drei";
+import { useInViewCanvas } from "@/lib/useInViewCanvas";
 
 // Spreads points across a flattened ellipsoid (a "disk cloud") using a golden-
 // angle spiral, so icons read as an orbiting cluster rather than a rigid ring
@@ -114,7 +115,7 @@ const ConstellationGroup = ({ apps, positions }) => {
   );
 };
 
-const AppsConstellationScene = ({ apps }) => {
+const AppsConstellationScene = ({ apps, frameloop }) => {
   const spread = Math.max(2.4, Math.sqrt(apps.length) * 0.6);
   const positions = useMemo(
     () => ellipsoidCloud(apps.length, spread, spread * 0.55, spread),
@@ -126,6 +127,7 @@ const AppsConstellationScene = ({ apps }) => {
       dpr={[1, 1.5]}
       camera={{ position: [0, spread * 0.6, spread + 3], fov: 48 }}
       gl={{ antialias: true, alpha: true }}
+      frameloop={frameloop}
     >
       <Suspense fallback={null}>
         <ConstellationGroup apps={apps} positions={positions} />
@@ -147,10 +149,16 @@ const AppsConstellationScene = ({ apps }) => {
 // connected by faint constellation lines — a deliberately different feel
 // from Skills' rigid sphere: looser, alive, and more "network" than "globe".
 const AppsConstellation = ({ apps }) => {
+  const { ref, isInView, hasBeenVisible } = useInViewCanvas("50px");
   if (!apps || apps.length === 0) return null;
   return (
-    <div className="relative w-full h-[420px] sm:h-[480px] lg:h-[540px] rounded-2xl border border-border bg-card/30 overflow-hidden">
-      <AppsConstellationScene apps={apps} />
+    <div
+      ref={ref}
+      className="relative w-full h-[420px] sm:h-[480px] lg:h-[540px] rounded-2xl border border-border bg-card/30 overflow-hidden"
+    >
+      {hasBeenVisible && (
+        <AppsConstellationScene apps={apps} frameloop={isInView ? "always" : "never"} />
+      )}
       <p className="absolute bottom-3 left-1/2 -translate-x-1/2 font-mono text-[11px] text-muted-foreground/70 pointer-events-none">
         drag to explore
       </p>

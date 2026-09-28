@@ -48,7 +48,7 @@ function Starfield({ count }) {
   );
 }
 
-const ParticleField = ({ density = "high" }) => {
+const ParticleField = ({ density = "high", frameloop = "always" }) => {
   const count = density === "low" ? 700 : 2200;
 
   return (
@@ -57,6 +57,7 @@ const ParticleField = ({ density = "high" }) => {
       camera={{ position: [0, 0, 1.6], fov: 60 }}
       gl={{ antialias: true, alpha: true }}
       style={{ position: "absolute", inset: 0 }}
+      frameloop={frameloop}
     >
       <Starfield count={count} />
     </Canvas>

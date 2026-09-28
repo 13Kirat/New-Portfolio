@@ -66,7 +66,7 @@ const Timeline = () => {
 
   return (
     <div className="w-full flex flex-col gap-10">
-      <SectionHeading kicker="where i've been" title="EXPERI" accent="ENCE" />
+      <SectionHeading kicker="where i've been" title="" accent="EXPERIENCE" />
 
       <div className="terminal-window">
         <div className="terminal-window-bar">

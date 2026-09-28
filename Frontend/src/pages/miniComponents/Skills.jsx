@@ -26,7 +26,7 @@ const Skills = () => {
 
   return (
     <div className="w-full flex flex-col gap-10">
-      <SectionHeading kicker="what i work with" title="SKI" accent="LLS" />
+      <SectionHeading kicker="what i work with" title="" accent="SKILLS" />
 
       {isDesktop ? (
         <Suspense

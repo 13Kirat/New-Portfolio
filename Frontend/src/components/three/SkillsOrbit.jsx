@@ -1,6 +1,7 @@
 import React, { Suspense, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Billboard, OrbitControls, Text, useTexture } from "@react-three/drei";
+import { useInViewCanvas } from "@/lib/useInViewCanvas";
 
 // Evenly distributes `count` points across a sphere surface (Fibonacci sphere).
 function sphereLayout(count, radius) {
@@ -64,7 +65,7 @@ const RotatingGroup = ({ items, positions }) => {
   );
 };
 
-const SkillsOrbitScene = ({ items }) => {
+const SkillsOrbitScene = ({ items, frameloop }) => {
   const radius = Math.max(2.6, Math.sqrt(items.length) * 0.62);
   const positions = useMemo(() => sphereLayout(items.length, radius), [items.length, radius]);
   return (
@@ -72,6 +73,7 @@ const SkillsOrbitScene = ({ items }) => {
       dpr={[1, 1.5]}
       camera={{ position: [0, 0, radius + 3.2], fov: 45 }}
       gl={{ antialias: true, alpha: true }}
+      frameloop={frameloop}
     >
       <Suspense fallback={null}>
         <RotatingGroup items={items} positions={positions} />
@@ -90,10 +92,16 @@ const SkillsOrbitScene = ({ items }) => {
 // Wraps the sphere scene with a stable sizing container; the parent decides
 // whether to render this at all (desktop) vs. falling back to a flat grid.
 const SkillsOrbit = ({ items }) => {
+  const { ref, isInView, hasBeenVisible } = useInViewCanvas("50px");
   if (!items || items.length === 0) return null;
   return (
-    <div className="relative w-full h-[420px] sm:h-[480px] lg:h-[560px] rounded-2xl border border-border bg-card/30 overflow-hidden">
-      <SkillsOrbitScene items={items} />
+    <div
+      ref={ref}
+      className="relative w-full h-[420px] sm:h-[480px] lg:h-[560px] rounded-2xl border border-border bg-card/30 overflow-hidden"
+    >
+      {hasBeenVisible && (
+        <SkillsOrbitScene items={items} frameloop={isInView ? "always" : "never"} />
+      )}
       <p className="absolute bottom-3 left-1/2 -translate-x-1/2 font-mono text-[11px] text-muted-foreground/70 pointer-events-none">
         drag to rotate
       </p>

@@ -130,12 +130,22 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    position: relative;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  /* A ::before with position:fixed composites as its own GPU layer far more
+     reliably than background-attachment:fixed directly on body, which forces
+     a repaint of the whole gradient on every scroll frame in some engines. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
     background-image:
       radial-gradient(circle at 15% 0%, oklch(0.82 0.19 155 / 6%), transparent 40%),
       radial-gradient(circle at 85% 20%, oklch(0.78 0.14 200 / 6%), transparent 40%);
-    background-attachment: fixed;
-    overflow-x: hidden;
-    width: 100%;
   }
   h1, h2, h3, h4, .font-mono-heading {
     font-family: var(--font-mono);
