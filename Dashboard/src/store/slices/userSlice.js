@@ -9,6 +9,7 @@ const userSlice = createSlice({
     loading: false,
     user: {},
     isAuthenticated: false,
+    authChecked: false,
     error: null,
     message: null,
     isUpdated: false,
@@ -23,18 +24,21 @@ const userSlice = createSlice({
     loginSuccess(state, action) {
       state.loading = false;
       state.isAuthenticated = true;
+      state.authChecked = true;
       state.user = action.payload;
       state.error = null;
     },
     loginFailed(state, action) {
       state.loading = false;
       state.isAuthenticated = false;
+      state.authChecked = true;
       state.user = {};
       state.error = action.payload;
     },
     logoutSuccess(state, action) {
       state.loading = false;
       state.isAuthenticated = false;
+      state.authChecked = true;
       state.user = {};
       state.error = null;
       state.message = action.payload;
@@ -54,12 +58,14 @@ const userSlice = createSlice({
     loadUserSuccess(state, action) {
       state.loading = false;
       state.isAuthenticated = true;
+      state.authChecked = true;
       state.user = action.payload;
       state.error = null;
     },
     loadUserFailed(state, action) {
       state.loading = false;
       state.isAuthenticated = false;
+      state.authChecked = true;
       state.user = {};
       state.error = action.payload;
     },

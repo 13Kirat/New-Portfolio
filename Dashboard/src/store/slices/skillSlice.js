@@ -57,21 +57,6 @@ const skillSlice = createSlice({
       state.loading = false;
       state.message = null;
     },
-    updateSkillRequest(state, action) {
-      state.loading = true;
-      state.error = null;
-      state.message = null;
-    },
-    updateSkillSuccess(state, action) {
-      state.loading = false;
-      state.message = action.payload;
-      state.error = null;
-    },
-    updateSkillFailed(state, action) {
-      state.error = action.payload;
-      state.loading = false;
-      state.message = null;
-    },
     resetSkillSlice(state, action) {
       state.error = null;
       state.skills = state.skills;
@@ -118,24 +103,6 @@ export const addNewSkill = (data) => async (dispatch) => {
     dispatch(skillSlice.actions.clearAllErrors());
   } catch (error) {
     dispatch(skillSlice.actions.addNewSkillFailed(error.response.data.message));
-  }
-};
-
-export const updateSkill = (id, proficiency) => async (dispatch) => {
-  dispatch(skillSlice.actions.updateSkillRequest());
-  try {
-    const response = await axios.put(
-      `${BACKEND_URL}/api/v1/skill/update/${id}`,
-      { proficiency },
-      {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    dispatch(skillSlice.actions.updateSkillSuccess(response.data.message));
-    dispatch(skillSlice.actions.clearAllErrors());
-  } catch (error) {
-    dispatch(skillSlice.actions.updateSkillFailed(error.response.data.message));
   }
 };
 

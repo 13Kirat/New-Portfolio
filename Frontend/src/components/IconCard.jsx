@@ -3,8 +3,8 @@ import { Card } from "@/components/ui/card";
 // eslint-disable-next-line no-unused-vars -- used via JSX member tags (<motion.div>)
 import { motion } from "framer-motion";
 
-// Shared hover card for Skills + MyApps grids. `proficiency` is optional (0-100).
-const IconCard = ({ iconUrl, title, proficiency }) => {
+// Shared hover card for Skills + MyApps grids.
+const IconCard = ({ iconUrl, title }) => {
   return (
     <motion.div
       whileHover={{ y: -6, scale: 1.03 }}
@@ -20,17 +20,6 @@ const IconCard = ({ iconUrl, title, proficiency }) => {
         <p className="text-sm sm:text-base text-muted-foreground text-center font-mono">
           {title}
         </p>
-        {typeof proficiency === "number" && (
-          <div className="w-full h-1.5 rounded-full bg-muted overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-primary to-accent"
-              initial={{ width: 0 }}
-              whileInView={{ width: `${Math.min(100, Math.max(0, proficiency))}%` }}
-              viewport={{ once: true }}
-              transition={{ duration: 1, ease: "easeOut" }}
-            />
-          </div>
-        )}
       </Card>
     </motion.div>
   );

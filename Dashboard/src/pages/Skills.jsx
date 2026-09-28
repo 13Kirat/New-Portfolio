@@ -13,7 +13,6 @@ import {
   deleteSkill,
   getAllSkills,
   resetSkillSlice,
-  updateSkill,
 } from "@/store/slices/skillSlice";
 
 const Skills = () => {
@@ -21,10 +20,8 @@ const Skills = () => {
   const dispatch = useDispatch();
 
   const [title, setTitle] = useState("");
-  const [proficiency, setProficiency] = useState("");
   const [svg, setSvg] = useState("");
   const [svgPreview, setSvgPreview] = useState("");
-  const [pendingProficiency, setPendingProficiency] = useState({});
 
   const handleSvg = (e) => {
     const file = e.target.files[0];
@@ -40,15 +37,8 @@ const Skills = () => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("title", title);
-    formData.append("proficiency", proficiency);
     formData.append("svg", svg);
     dispatch(addNewSkill(formData));
-  };
-
-  const handleUpdateSkill = (id) => {
-    const value = pendingProficiency[id];
-    if (value === undefined) return;
-    dispatch(updateSkill(id, value));
   };
 
   const handleDeleteSkill = (id) => {
@@ -63,7 +53,6 @@ const Skills = () => {
     if (message) {
       toast.success(message);
       setTitle("");
-      setProficiency("");
       setSvg("");
       setSvgPreview("");
       dispatch(resetSkillSlice());
@@ -95,16 +84,6 @@ const Skills = () => {
             />
           </div>
           <div>
-            <Label className="font-mono text-sm">Proficiency</Label>
-            <Input
-              type="number"
-              className="mt-2"
-              placeholder="70"
-              value={proficiency}
-              onChange={(e) => setProficiency(e.target.value)}
-            />
-          </div>
-          <div>
             <Label className="font-mono text-sm">Icon</Label>
             <div className="mt-2">
               <FileDropzone
@@ -127,35 +106,22 @@ const Skills = () => {
         <h2 className="font-mono text-lg font-semibold mb-4 text-muted-foreground">
           Existing Skills ({skills?.length || 0})
         </h2>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {skills && skills.length > 0 ? (
             skills.map((element) => (
-              <div key={element._id} className="terminal-window p-4 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img src={element.svg?.url} alt={element.title} className="w-8 h-8 object-contain" />
-                    <span className="font-mono font-medium">{element.title}</span>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteSkill(element._id)}
-                    className="text-muted-foreground hover:text-destructive transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Label className="font-mono text-xs text-muted-foreground shrink-0">
-                    Proficiency
-                  </Label>
-                  <Input
-                    type="number"
-                    defaultValue={element.proficiency}
-                    onChange={(e) =>
-                      setPendingProficiency((prev) => ({ ...prev, [element._id]: e.target.value }))
-                    }
-                    onBlur={() => handleUpdateSkill(element._id)}
-                  />
-                </div>
+              <div
+                key={element._id}
+                className="terminal-window p-4 flex flex-col items-center gap-3"
+              >
+                <img src={element.svg?.url} alt={element.title} className="w-10 h-10 object-contain" />
+                <span className="font-mono text-sm text-center">{element.title}</span>
+                <button
+                  onClick={() => handleDeleteSkill(element._id)}
+                  className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Delete
+                </button>
               </div>
             ))
           ) : (

@@ -38,8 +38,11 @@ const About = () => {
               <p><span className="tok-kw">const</span> about = {"{"}</p>
               <p className="pl-4">name: <span className="tok-str">"Gurkirat Singh"</span>,</p>
               <p className="pl-4">role: <span className="tok-str">"Full Stack Developer"</span>,</p>
-              <p className="pl-4">studying: <span className="tok-str">"B.E. Electronics & Computer, Thapar University"</span>,</p>
-              <p className="pl-4">graduating: <span className="tok-num">2027</span>,</p>
+              <p className="pl-4">education: {"{"}</p>
+              <p className="pl-8">degree: <span className="tok-str">"B.E. Electronics & Computer Engineering"</span>,</p>
+              <p className="pl-8">university: <span className="tok-str">"Thapar University, Patiala"</span>,</p>
+              <p className="pl-8">duration: <span className="tok-str">"Aug 2023 – May 2027"</span>,</p>
+              <p className="pl-4">{"}"},</p>
               <p className="pl-4">focus: [<span className="tok-str">"React Native"</span>, <span className="tok-str">"MERN"</span>, <span className="tok-str">"Cloud"</span>],</p>
               <p className="pl-4">outsideOfCode: [<span className="tok-str">"movies"</span>, <span className="tok-str">"gaming"</span>, <span className="tok-str">"hackathons"</span>],</p>
               <p>{"}"};</p>

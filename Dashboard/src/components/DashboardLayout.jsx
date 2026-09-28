@@ -35,7 +35,7 @@ const navLinkClass = ({ isActive }) =>
   }`;
 
 const DashboardLayout = () => {
-  const { isAuthenticated, error, user } = useSelector((state) => state.user);
+  const { isAuthenticated, authChecked, error, user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigateTo = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -50,10 +50,28 @@ const DashboardLayout = () => {
     if (error) {
       toast.error(error);
     }
-    if (!isAuthenticated) {
+    // Wait for the initial getUser() check to resolve before deciding to bounce
+    // to /login — otherwise a hard refresh always redirects away first (Redux
+    // state starts as isAuthenticated:false) and then flips back once the
+    // check completes, which looks like it's "auto re-authorizing".
+    if (authChecked && !isAuthenticated) {
       navigateTo("/login");
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, authChecked]);
+
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center">
+        <p className="font-mono text-sm text-muted-foreground">
+          <span className="text-primary">$</span> checking session...
+        </p>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen w-full flex">

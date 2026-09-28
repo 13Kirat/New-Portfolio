@@ -3,11 +3,14 @@ import ErrorHandler from "../middlewares/error.js";
 import { Timeline } from "../models/timelineSchema.js";
 
 export const postTimeline = catchAsyncErrors(async (req, res, next) => {
-  const { title, description, from, to } = req.body;
+  const { title, description, from, to, employmentType, locationType, location } = req.body;
   const newTimeline = await Timeline.create({
     title,
     description,
     timeline: { from, to },
+    employmentType,
+    locationType,
+    location,
   });
   res.status(200).json({
     success: true,

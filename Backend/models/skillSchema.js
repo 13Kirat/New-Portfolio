@@ -4,9 +4,6 @@ const skillSchema = new mongoose.Schema({
   title: {
     type: String,
   },
-  proficiency: {
-    type: Number,
-  },
   svg: {
     public_id: {
       type: String,

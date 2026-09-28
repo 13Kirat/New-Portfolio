@@ -17,6 +17,18 @@ const timelineSchema = new mongoose.Schema({
       type: String,
     },
   },
+  employmentType: {
+    type: String,
+    trim: true,
+  },
+  locationType: {
+    type: String,
+    trim: true,
+  },
+  location: {
+    type: String,
+    trim: true,
+  },
 });
 
 export const Timeline = mongoose.model("Timeline", timelineSchema);

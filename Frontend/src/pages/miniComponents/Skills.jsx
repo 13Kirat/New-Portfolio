@@ -28,7 +28,6 @@ const Skills = () => {
               <IconCard
                 iconUrl={element?.svg?.url}
                 title={element?.title}
-                proficiency={element?.proficiency}
               />
             </Reveal>
           ))}

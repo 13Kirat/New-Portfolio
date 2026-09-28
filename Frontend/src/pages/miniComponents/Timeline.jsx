@@ -36,6 +36,25 @@ const Timeline = () => {
                 <time className="block mb-2 font-mono text-xs text-primary/80">
                   {element?.timeline?.from} — {element?.timeline?.to ? element?.timeline?.to : "Present"}
                 </time>
+                {(element?.employmentType || element?.locationType || element?.location) && (
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {element?.employmentType && (
+                      <span className="text-[0.65rem] font-mono px-2 py-0.5 rounded-full border border-primary/30 text-primary/90 bg-primary/5">
+                        {element.employmentType}
+                      </span>
+                    )}
+                    {element?.locationType && (
+                      <span className="text-[0.65rem] font-mono px-2 py-0.5 rounded-full border border-accent/30 text-accent/90 bg-accent/5">
+                        {element.locationType}
+                      </span>
+                    )}
+                    {element?.location && (
+                      <span className="text-[0.65rem] font-mono px-2 py-0.5 rounded-full border border-border text-muted-foreground">
+                        {element.location}
+                      </span>
+                    )}
+                  </div>
+                )}
                 <p className="text-sm sm:text-base text-muted-foreground">
                   {element?.description}
                 </p>
