@@ -2,6 +2,7 @@ import { Message } from "../models/messageSchema.js";
 import { catchAsyncErrors } from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../middlewares/error.js";
 import { sendEmail } from "../utils/sendEmail.js";
+import { sendWhatsAppContactNotification } from "../utils/whatsapp.js";
 
 export const sendMessage = catchAsyncErrors(async (req, res, next) => {
   const { senderName, subject, message } = req.body;
@@ -19,6 +20,13 @@ export const sendMessage = catchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     console.error("Email Sending Error:", error);
     // We don't return next(error) here because the message was already saved to DB successfully
+  }
+
+  try {
+    await sendWhatsAppContactNotification({ senderName, subject, message });
+  } catch (error) {
+    console.error("WhatsApp Notification Error:", error.message);
+    // Same as email above — the message is already saved, don't fail the request over this.
   }
 
   res.status(201).json({

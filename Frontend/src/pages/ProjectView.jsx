@@ -19,6 +19,7 @@ const ProjectView = () => {
   const [technologies, setTechnologies] = useState("");
   const [domain, setDomain] = useState("");
   const [category, setCategory] = useState("");
+  const [projectType, setProjectType] = useState("");
   const [stack, setStack] = useState("");
   const [status, setStatus] = useState("");
   const [gitRepoLink, setGitRepoLink] = useState("");
@@ -37,6 +38,7 @@ const ProjectView = () => {
           setDescription(res.data.project.description);
           setDomain(res.data.project.domain || "");
           setCategory(res.data.project.category || "");
+          setProjectType(res.data.project.projectType || "");
           setStack(res.data.project.stack || "");
           setStatus(res.data.project.status || "");
           setTechnologies(res.data.project.technologies);
@@ -84,6 +86,7 @@ const ProjectView = () => {
         <div className="flex flex-wrap gap-2 mb-8">
           {domain && <Badge>{domain}</Badge>}
           {category && <Badge>{category}</Badge>}
+          {projectType && <Badge>{projectType}</Badge>}
           {stack && <Badge>{stack}</Badge>}
           {status && <Badge>{status}</Badge>}
         </div>

@@ -71,6 +71,7 @@ const Projects = () => {
               <TableHead>Title</TableHead>
               <TableHead className="hidden md:table-cell">Stack</TableHead>
               <TableHead className="hidden md:table-cell">Domain</TableHead>
+              <TableHead className="hidden md:table-cell">Type</TableHead>
               <TableHead className="hidden md:table-cell">Status</TableHead>
               <TableHead className="hidden md:table-cell">Visible</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -93,6 +94,9 @@ const Projects = () => {
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">
                     {element.domain || "-"}
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell text-muted-foreground">
+                    {element.projectType || "-"}
                   </TableCell>
                   <TableCell className="hidden md:table-cell text-muted-foreground">
                     {element.status || "-"}
@@ -120,7 +124,7 @@ const Projects = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-10">
+                <TableCell colSpan={8} className="text-center text-muted-foreground py-10">
                   You have not added any project yet.
                 </TableCell>
               </TableRow>

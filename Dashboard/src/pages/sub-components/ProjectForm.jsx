@@ -22,6 +22,7 @@ const CUSTOM_DOMAIN_VALUE = "__CUSTOM_DOMAIN__";
 const CUSTOM_CATEGORY_VALUE = "__CUSTOM_CATEGORY__";
 const CUSTOM_STACK_VALUE = "__CUSTOM_STACK__";
 const CUSTOM_STATUS_VALUE = "__CUSTOM_STATUS__";
+const CUSTOM_PROJECT_TYPE_VALUE = "__CUSTOM_PROJECT_TYPE__";
 
 const fieldLabelClass = "block text-sm font-medium leading-6 text-foreground font-mono";
 
@@ -43,6 +44,7 @@ const ProjectForm = ({ mode, initialProject, onSubmit, loading }) => {
   const [technologies, setTechnologies] = useState(initialProject?.technologies || "");
   const [domain, setDomain] = useState(initialProject?.domain || "");
   const [category, setCategory] = useState(initialProject?.category || "");
+  const [projectType, setProjectType] = useState(initialProject?.projectType || "");
   const [stack, setStack] = useState(initialProject?.stack || "");
   const [status, setStatus] = useState(initialProject?.status || "");
   const [visible, setVisible] = useState(
@@ -58,6 +60,7 @@ const ProjectForm = ({ mode, initialProject, onSubmit, loading }) => {
   );
   const [customDomain, setCustomDomain] = useState("");
   const [customCategory, setCustomCategory] = useState("");
+  const [customProjectType, setCustomProjectType] = useState("");
   const [customStack, setCustomStack] = useState("");
   const [customStatus, setCustomStatus] = useState("");
 
@@ -106,6 +109,8 @@ const ProjectForm = ({ mode, initialProject, onSubmit, loading }) => {
       category === CUSTOM_CATEGORY_VALUE ? customCategory.trim() : category.trim();
     const finalStack = stack === CUSTOM_STACK_VALUE ? customStack.trim() : stack.trim();
     const finalStatus = status === CUSTOM_STATUS_VALUE ? customStatus.trim() : status.trim();
+    const finalProjectType =
+      projectType === CUSTOM_PROJECT_TYPE_VALUE ? customProjectType.trim() : projectType.trim();
 
     if (!finalDomain || !finalCategory || !finalStack || !finalStatus) {
       toast.error("Please fill domain, category, stack and status.");
@@ -117,6 +122,7 @@ const ProjectForm = ({ mode, initialProject, onSubmit, loading }) => {
     formData.append("description", description);
     formData.append("domain", finalDomain);
     formData.append("category", finalCategory);
+    formData.append("projectType", finalProjectType);
     formData.append("gitRepoLink", gitRepoLink);
     formData.append("projectLink", projectLink);
     formData.append("technologies", technologies);
@@ -217,6 +223,29 @@ const ProjectForm = ({ mode, initialProject, onSubmit, loading }) => {
                   placeholder="Enter new category"
                   value={customCategory}
                   onChange={(e) => setCustomCategory(e.target.value)}
+                />
+              )}
+            </div>
+
+            <div>
+              <Label className={fieldLabelClass}>Project Type</Label>
+              <Select value={projectType} onValueChange={setProjectType}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Freelance / Internship / Personal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Freelance">Freelance</SelectItem>
+                  <SelectItem value="Internship">Internship</SelectItem>
+                  <SelectItem value="Personal Project">Personal Project</SelectItem>
+                  <SelectItem value={CUSTOM_PROJECT_TYPE_VALUE}>+ Add New</SelectItem>
+                </SelectContent>
+              </Select>
+              {projectType === CUSTOM_PROJECT_TYPE_VALUE && (
+                <Input
+                  className="mt-2"
+                  placeholder="Enter project type"
+                  value={customProjectType}
+                  onChange={(e) => setCustomProjectType(e.target.value)}
                 />
               )}
             </div>

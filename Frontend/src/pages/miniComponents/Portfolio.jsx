@@ -16,6 +16,7 @@ const Portfolio = () => {
   const [projects, setProjects] = useState([]);
   const [domainFilter, setDomainFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
+  const [projectTypeFilter, setProjectTypeFilter] = useState("all");
   const [stackFilter, setStackFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -34,6 +35,16 @@ const Portfolio = () => {
       ...new Set(
         (projects || [])
           .map((project) => project?.category)
+          .filter((value) => value && value.trim())
+      ),
+    ];
+  }, [projects]);
+
+  const projectTypeOptions = useMemo(() => {
+    return [
+      ...new Set(
+        (projects || [])
+          .map((project) => project?.projectType)
           .filter((value) => value && value.trim())
       ),
     ];
@@ -63,17 +74,19 @@ const Portfolio = () => {
     return (projects || []).filter((project) => {
       const domain = (project?.domain || "").toLowerCase();
       const category = (project?.category || "").toLowerCase();
+      const projectType = (project?.projectType || "").toLowerCase();
       const stack = (project?.stack || "").toLowerCase();
       const status = (project?.status || "").toLowerCase();
 
       const domainMatches = domainFilter === "all" || domain === domainFilter;
       const categoryMatches = categoryFilter === "all" || category === categoryFilter;
+      const projectTypeMatches = projectTypeFilter === "all" || projectType === projectTypeFilter;
       const stackMatches = stackFilter === "all" || stack === stackFilter;
       const statusMatches = statusFilter === "all" || status === statusFilter;
 
-      return domainMatches && categoryMatches && stackMatches && statusMatches;
+      return domainMatches && categoryMatches && projectTypeMatches && stackMatches && statusMatches;
     });
-  }, [projects, domainFilter, categoryFilter, stackFilter, statusFilter]);
+  }, [projects, domainFilter, categoryFilter, projectTypeFilter, stackFilter, statusFilter]);
 
   const visibleProjects = viewAll ? filteredProjects : filteredProjects.slice(0, 9);
 
@@ -92,7 +105,7 @@ const Portfolio = () => {
     <div className="w-full flex flex-col gap-10">
       <SectionHeading kicker="things i've built" title="MY" accent="PROJECTS" />
 
-      <Reveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <Reveal className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <div>
           <label className="block text-xs font-mono mb-2 text-muted-foreground">domain</label>
           <select
@@ -123,6 +136,24 @@ const Portfolio = () => {
           >
             <option value="all">All Categories</option>
             {categoryOptions.map((option) => (
+              <option key={option} value={option.toLowerCase()}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-mono mb-2 text-muted-foreground">type</label>
+          <select
+            className={selectClass}
+            value={projectTypeFilter}
+            onChange={(e) => {
+              setProjectTypeFilter(e.target.value);
+              setViewAll(false);
+            }}
+          >
+            <option value="all">All Types</option>
+            {projectTypeOptions.map((option) => (
               <option key={option} value={option.toLowerCase()}>
                 {option}
               </option>

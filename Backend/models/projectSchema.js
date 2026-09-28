@@ -11,6 +11,10 @@ const projectSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  projectType: {
+    type: String,
+    trim: true,
+  },
   gitRepoLink: String,
   projectLink: String,
   technologies: String,
