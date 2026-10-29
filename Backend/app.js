@@ -22,6 +22,8 @@ const allowedOrigins = [
     process.env.DASHBOARD_URL,
     "https://kirat-portfolio.vercel.app",
     "https://admin-kirat-portfolio.vercel.app",
+    "https://www.gurkiratsingh.codes",
+    "https://www.admin.gurkiratsingh.codes"
 ];
 const localhostOriginPattern = /^http:\/\/localhost:\d+$/;
 

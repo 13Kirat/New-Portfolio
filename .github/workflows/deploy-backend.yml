@@ -1,0 +1,42 @@
+name: Deploy backend
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "Backend/**"
+      - ".github/workflows/deploy-backend.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update active Openship release and restart
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AZURE_HOST }}
+          username: ${{ secrets.AZURE_USER }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          script_stop: true
+          script: |
+            # The deployment Openship currently runs (its systemd unit is named after the release dir).
+            UNIT=$(systemctl list-units 'openship-dep_*' --state=active --no-pager --plain --no-legend | awk '{print $1}' | head -n1)
+            [ -n "$UNIT" ] || { echo "No active Openship deployment found"; exit 1; }
+            DEP=${UNIT%.service}; DEP=${DEP#openship-}
+            DIR=/opt/openship/releases/$DEP
+            echo "Updating $DIR"
+
+            cd "$DIR"
+            git fetch --depth 1 origin master
+            git reset --hard FETCH_HEAD
+            cd Backend && npm install --omit=dev
+
+            sudo systemctl restart "$UNIT"
+            sleep 5
+            systemctl is-active --quiet "$UNIT" || { journalctl -u "$UNIT" -n 30 --no-pager; exit 1; }
+            curl -fsS -m 10 -o /dev/null http://127.0.0.1:4000/ && echo "Backend is up"
